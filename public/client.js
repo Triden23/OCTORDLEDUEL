@@ -97,13 +97,15 @@
         }
         else if(data.type==='update'){
           const {guess, feedbacks, fromYou} = data;
-          feedbacks.forEach((fb,b)=>{
-            const boardState = fromYou?yourState:oppState;
+          feedbacks.forEach((fb, b) => {
+          if (!fb) return; // skip boards that are already solved
+            const boardState = fromYou ? yourState : oppState;
             const attempts = boardState.attemptsPerBoard[b].length;
-            boardState.attemptsPerBoard[b].push({guess, feedback:fb});
-            if(fb.every(c=>'g'===c)) boardState.solved[b]=true;
-            applyFeedback(b, attempts, guess, fb, fromYou);
+            boardState.attemptsPerBoard[b].push({ guess, feedback: fb });
+            if (fb.every(c => c === 'g')) boardState.solved[b] = true;
+              applyFeedback(b, attempts, guess, fb, fromYou);
           });
+
           if(fromYou){ yourState.solvedCount=data.solvedCount; } else { oppState.solvedCount=data.solvedCount; }
           updateScores();
           if(fromYou) addMsg(`${data.guesser} guessed "${guess.toUpperCase()}"`);

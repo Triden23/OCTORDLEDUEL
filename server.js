@@ -1620,22 +1620,24 @@ wss.on('connection', function(ws, req){
           return fb;
         });
 
-        room.sockets.forEach(s=>{
+        room.sockets.forEach(s => {
         const fromYou = (s.playerId === playerId);
         const targetData = room.playersData[s.playerId];
 
-        // Only include boards that target hasn't solved yet
-        const filteredFeedbacks = targetData.solved.map((solved, idx) => solved ? null : feedbacks[idx]);
-
+        const filteredFeedbacks = feedbacks.map((fb, idx) => {
+          return targetData.solved[idx] ? undefined : fb; // undefined for solved boards
+        });
+      
         s.ws.send(JSON.stringify({
-        type: 'update',
-        guesser: playerId,
-        guess,
-        feedbacks: filteredFeedbacks, // null for solved boards
-        solvedCount: targetData.solvedCount,
-        fromYou
+          type: 'update',
+          guesser: playerId,
+          guess,
+          feedbacks: filteredFeedbacks,
+          solvedCount: targetData.solvedCount,
+          fromYou
         }));
       });
+
 
 
         if(playerData.solvedCount===room.answers.length){
