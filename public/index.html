@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>1v1 Octordle — Private</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>1v1 Octordle — Private</h1>
+
+    <div id="controls">
+      <label>Room: <input id="roomInput" placeholder="room name (same as partner)" /></label>
+      <button id="joinBtn">Join</button>
+      <div id="status">Not connected</div>
+    </div>
+
+    <div id="gameArea" class="hidden">
+      <div id="youColumn" class="column">
+        <h2>You <span id="youScore">0/8</span></h2>
+        <div id="yourBoards" class="boards"></div>
+      </div>
+
+      <div id="opColumn" class="column">
+        <h2>Opponent <span id="opScore">0/8</span></h2>
+        <div id="oppBoards" class="boards"></div>
+      </div>
+    </div>
+
+    <div id="inputArea" class="hidden">
+      <div>Select board:
+        <select id="boardSelect"></select>
+        <input id="guessInput" maxlength="5" placeholder="enter 5-letter guess"/>
+        <button id="guessBtn">Guess</button>
+      </div>
+      <div id="messages"></div>
+    </div>
+
+    <div id="footer">
+      <small>Small scale test :P</small>
+    </div>
+  </div>
+
+  <script src="/client.js"></script>
+</body>
+</html>
