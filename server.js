@@ -1624,17 +1624,11 @@ wss.on('connection', function(ws, req){
         const fromYou = (s.playerId === playerId);
         const targetData = room.playersData[s.playerId];
               
-        // Send full feedback for boards the player hasn't solved yet
-        const filteredFeedbacks = feedbacks.map((fb, idx) => {
-          // always send feedback for this board if it is NOT solved for the recipient
-          return targetData.solved[idx] ? undefined : fb;
-        });
-      
         s.ws.send(JSON.stringify({
           type: 'update',
           guesser: playerId,
           guess,
-          feedbacks: filteredFeedbacks,
+          feedbacks, // send all feedbacks for this guess
           solvedCount: targetData.solvedCount,
           fromYou
         }));
