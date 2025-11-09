@@ -73,8 +73,8 @@
   }
 
   function connect(room){
-    const loc=window.location;
-    const wsUrl = 'ws://YOUR_PUBLIC_IP:8080/?room=' + encodeURIComponent(room);
+    const loc = window.location;
+    const wsUrl = `ws://${loc.hostname}:8080/?room=${encodeURIComponent(room)}`;
     ws = new WebSocket(wsUrl);
     setStatus('Connecting...');
     ws.onopen=()=>setStatus('Connected');
