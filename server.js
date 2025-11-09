@@ -1599,43 +1599,45 @@ wss.on('connection', function(ws, req){
     try{
       const data = JSON.parse(raw);
       if(data.type==='guess'){
-        const guess = data.guess.trim().toLowerCase();
+  const guess = data.guess.trim().toLowerCase();
+  if(!WORDS.includes(guess)) {
+    ws.send(JSON.stringify({type:'invalid', message:'Word not in word list!'}));
+    return;
+  }
 
-        // Validate guess exists in WORDS
-        if(!WORDS.includes(guess)){
-          ws.send(JSON.stringify({type:'invalid', message:'Word not in word list!'}));
-          return;
-        }
+  const playerData = room.playersData[playerId];
 
-        if(guess.length !== room.answers[0].length) return;
+  const feedbacks = room.answers.map((answer,i)=>{
+    const fb = getFeedback(guess, answer);
+    playerData.attemptsPerBoard[i].push({ guess, feedback:fb });
 
-        const playerData = room.playersData[playerId];
-        const feedbacks = room.answers.map((answer,i)=>{
-          const fb = getFeedback(guess, answer);
-          playerData.attemptsPerBoard[i].push({ guess, feedback:fb });
-          if(fb.every(c=>'g'===c) && !playerData.solved[i]){
-            playerData.solved[i]=true;
-            playerData.solvedCount++;
-          }
-          return fb;
-        });
+    // Only mark as solved after applying feedback
+    if(fb.every(c=>'g'===c) && !playerData.solved[i]){
+      playerData.solved[i]=true;
+      playerData.solvedCount++;
+    }
 
-        room.sockets.forEach(s => {
-        const fromYou = (s.playerId === playerId);
-        const targetData = room.playersData[s.playerId];
-              
-        s.ws.send(JSON.stringify({
-          type: 'update',
-          guesser: playerId,
-          guess,
-          feedbacks, // send all feedbacks for this guess
-          solvedCount: targetData.solvedCount,
-          fromYou
-        }));
-      });
+    return fb; // always return fb for this guess
+  });
 
+  room.sockets.forEach(s=>{
+    const fromYou = (s.playerId===playerId);
+    const targetData = room.playersData[s.playerId];
 
+    // Only send feedback for boards that are not yet solved for the recipient
+    const filteredFeedbacks = feedbacks.map((fb, idx) => {
+      return targetData.solved[idx] ? null : fb;
+    });
 
+    s.ws.send(JSON.stringify({
+      type:'update',
+      guesser: playerId,
+      guess,
+      feedbacks: filteredFeedbacks,
+      solvedCount: targetData.solvedCount,
+      fromYou
+    }));
+  });
 
         if(playerData.solvedCount===room.answers.length){
           room.sockets.forEach(s=>{

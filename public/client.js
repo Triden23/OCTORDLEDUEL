@@ -98,18 +98,19 @@
         else if(data.type==='update'){
           const {guess, feedbacks, fromYou} = data;
           feedbacks.forEach((fb, b) => {
-            if (!fb) return; // this line can actually be removed now
-                    
-            const boardState = fromYou ? yourState : oppState;
-            const attempts = boardState.attemptsPerBoard[b].length;
-                    
-            // Always apply this guess's feedback
-            boardState.attemptsPerBoard[b].push({ guess, feedback: fb });
-            applyFeedback(b, attempts, guess, fb, fromYou);
-                    
-            // Mark solved AFTER applying feedback
-            if (fb.every(c => c === 'g')) boardState.solved[b] = true;
-          });
+          if (!fb) return; // skip boards already solved
+                  
+          const boardState = fromYou ? yourState : oppState;
+          const attempts = boardState.attemptsPerBoard[b].length;
+                  
+          // Always apply this guess
+          boardState.attemptsPerBoard[b].push({ guess, feedback: fb });
+          applyFeedback(b, attempts, guess, fb, fromYou);
+                  
+          // Only mark as solved after applying feedback
+          if(fb.every(c => c==='g')) boardState.solved[b] = true;
+        });
+
 
 
 
