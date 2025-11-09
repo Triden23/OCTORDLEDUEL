@@ -1599,68 +1599,69 @@ wss.on('connection', function (ws, req) {
     try {
       const data = JSON.parse(raw);
       if (data.type === 'guess') {
-  const guess = data.guess.trim().toLowerCase();
-  if (!WORDS.includes(guess)) {
-    ws.send(JSON.stringify({ type: 'invalid', message: 'Word not in word list!' }));
-    return;
-  }
+        const guess = data.guess.trim().toLowerCase();
+        if (!WORDS.includes(guess)) {
+          ws.send(JSON.stringify({ type: 'invalid', message: 'Word not in word list!' }));
+          return;
+        }
 
-  const playerData = room.playersData[playerId];
+        const playerData = room.playersData[playerId];
 
-  // Keep track of which boards were solved before this guess
-  const solvedBefore = [...playerData.solved];
+        // Keep track of boards solved BEFORE this guess
+        const solvedBefore = [...playerData.solved];
 
-  // Build feedback for each board
-  const feedbacks = room.answers.map((answer, i) => {
-    const fb = getFeedback(guess, answer);
-    playerData.attemptsPerBoard[i].push({ guess, feedback: fb });
+        // Compute feedback for all boards
+        const feedbacks = room.answers.map((answer, i) => {
+          const fb = getFeedback(guess, answer);
+          playerData.attemptsPerBoard[i].push({ guess, feedback: fb });
 
-    // Mark board as solved AFTER this guess
-    if (fb.every(c => c === 'g') && !playerData.solved[i]) {
-      playerData.solved[i] = true;
-      playerData.solvedCount++;
-    }
+          // If this guess solved the board, mark it for this player AND opponent
+          if (fb.every(c => c === 'g') && !playerData.solved[i]) {
+            playerData.solved[i] = true;
+            playerData.solvedCount++;
 
-    return fb; // always return feedback for this guess
-  });
+            // Update opponent solved state
+            room.sockets.forEach(s => {
+              if (s.playerId !== playerId) {
+                room.playersData[s.playerId].solved[i] = true;
+              }
+            });
+          }
+          return fb;
+        });
 
-  // Send updates to each player
-  room.sockets.forEach(s => {
-    const fromYou = (s.playerId === playerId);
-    const targetData = room.playersData[s.playerId];
+        // Send updates to each player
+        room.sockets.forEach(s => {
+          const fromYou = (s.playerId === playerId);
+          const targetData = room.playersData[s.playerId];
 
-    const filteredFeedbacks = feedbacks.map((fb, idx) => {
-      // Show feedback if:
-      // 1) board was NOT solved before this guess (including this guess if it solved it)
-      // 2) or if fromYou (you always see your own boards)
-      if (fromYou || !targetData.solved[idx] || !solvedBefore[idx]) return fb;
-      return null; // skip future updates for already solved boards
-    });
+          const filteredFeedbacks = feedbacks.map((fb, idx) => {
+            // Send feedback if this board was NOT solved before this guess
+            if (!solvedBefore[idx]) return fb;
+            return null; // skip future updates for already solved boards
+          });
 
-    s.ws.send(JSON.stringify({
-      type: 'update',
-      guesser: playerId,
-      guess,
-      feedbacks: filteredFeedbacks,
-      solvedCount: targetData.solvedCount,
-      fromYou
-    }));
-  });
+          s.ws.send(JSON.stringify({
+            type: 'update',
+            guesser: playerId,
+            guess,
+            feedbacks: filteredFeedbacks,
+            solvedCount: targetData.solvedCount,
+            fromYou
+          }));
+        });
 
-  // Finish game if player completed all boards
-  if (playerData.solvedCount === room.answers.length) {
-    room.sockets.forEach(s => {
-      s.ws.send(JSON.stringify({
-        type: 'finish',
-        winner: playerId,
-        message: playerId === s.playerId ? 'You finished all words! You win!' : 'Opponent finished all words.'
-      }));
-    });
-  }
-}
-
-
-
+        // Check for finished game
+        if (playerData.solvedCount === room.answers.length) {
+          room.sockets.forEach(s => {
+            s.ws.send(JSON.stringify({
+              type: 'finish',
+              winner: playerId,
+              message: playerId === s.playerId ? 'You finished all words! You win!' : 'Opponent finished all words.'
+            }));
+          });
+        }
+      }
 
 
     } catch (e) {
