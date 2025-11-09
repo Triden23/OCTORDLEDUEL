@@ -1599,61 +1599,67 @@ wss.on('connection', function (ws, req) {
     try {
       const data = JSON.parse(raw);
       if (data.type === 'guess') {
-        const guess = data.guess.trim().toLowerCase();
-        if (!WORDS.includes(guess)) {
-          ws.send(JSON.stringify({ type: 'invalid', message: 'Word not in word list!' }));
-          return;
-        }
+  const guess = data.guess.trim().toLowerCase();
+  if (!WORDS.includes(guess)) {
+    ws.send(JSON.stringify({ type: 'invalid', message: 'Word not in word list!' }));
+    return;
+  }
 
-        const playerData = room.playersData[playerId];
+  const playerData = room.playersData[playerId];
 
-        // Build feedback for each board
-        const feedbacks = room.answers.map((answer, i) => {
-          const fb = getFeedback(guess, answer);
-          playerData.attemptsPerBoard[i].push({ guess, feedback: fb });
+  // Keep track of which boards were solved before this guess
+  const solvedBefore = [...playerData.solved];
 
-          // Mark board as solved AFTER this guess
-          if (fb.every(c => c === 'g') && !playerData.solved[i]) {
-            playerData.solved[i] = true;
-            playerData.solvedCount++;
-          }
+  // Build feedback for each board
+  const feedbacks = room.answers.map((answer, i) => {
+    const fb = getFeedback(guess, answer);
+    playerData.attemptsPerBoard[i].push({ guess, feedback: fb });
 
-          return fb; // always return feedback for this guess
-        });
+    // Mark board as solved AFTER this guess
+    if (fb.every(c => c === 'g') && !playerData.solved[i]) {
+      playerData.solved[i] = true;
+      playerData.solvedCount++;
+    }
 
-        // Send updates to each player
-        room.sockets.forEach(s => {
-          const fromYou = (s.playerId === playerId);
-          const targetData = room.playersData[s.playerId];
+    return fb; // always return feedback for this guess
+  });
 
-          const filteredFeedbacks = feedbacks.map((fb, idx) => {
-            // Show the current guess feedback for all boards that were NOT solved BEFORE this guess
-            if (fromYou) return fb;
-            if (!targetData.solved[idx] || fb.every(c => c === 'g')) return fb;
-            return null; // skip future updates for already solved boards
-          });
+  // Send updates to each player
+  room.sockets.forEach(s => {
+    const fromYou = (s.playerId === playerId);
+    const targetData = room.playersData[s.playerId];
 
-          s.ws.send(JSON.stringify({
-            type: 'update',
-            guesser: playerId,
-            guess,
-            feedbacks: filteredFeedbacks,
-            solvedCount: targetData.solvedCount,
-            fromYou
-          }));
-        });
+    const filteredFeedbacks = feedbacks.map((fb, idx) => {
+      // Show feedback if:
+      // 1) board was NOT solved before this guess (including this guess if it solved it)
+      // 2) or if fromYou (you always see your own boards)
+      if (fromYou || !targetData.solved[idx] || !solvedBefore[idx]) return fb;
+      return null; // skip future updates for already solved boards
+    });
 
-        // Finish game if player completed all boards
-        if (playerData.solvedCount === room.answers.length) {
-          room.sockets.forEach(s => {
-            s.ws.send(JSON.stringify({
-              type: 'finish',
-              winner: playerId,
-              message: playerId === s.playerId ? 'You finished all words! You win!' : 'Opponent finished all words.'
-            }));
-          });
-        }
-      }
+    s.ws.send(JSON.stringify({
+      type: 'update',
+      guesser: playerId,
+      guess,
+      feedbacks: filteredFeedbacks,
+      solvedCount: targetData.solvedCount,
+      fromYou
+    }));
+  });
+
+  // Finish game if player completed all boards
+  if (playerData.solvedCount === room.answers.length) {
+    room.sockets.forEach(s => {
+      s.ws.send(JSON.stringify({
+        type: 'finish',
+        winner: playerId,
+        message: playerId === s.playerId ? 'You finished all words! You win!' : 'Opponent finished all words.'
+      }));
+    });
+  }
+}
+
+
 
 
 
