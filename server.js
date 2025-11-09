@@ -1621,16 +1621,22 @@ wss.on('connection', function(ws, req){
         });
 
         room.sockets.forEach(s=>{
-          const fromYou = (s.playerId===playerId);
-          s.ws.send(JSON.stringify({
-            type:'update',
-            guesser:playerId,
-            guess,
-            feedbacks,
-            solvedCount: playerData.solvedCount,
-            fromYou
-          }));
-        });
+        const fromYou = (s.playerId === playerId);
+        const targetData = room.playersData[s.playerId];
+
+        // Only include boards that target hasn't solved yet
+        const filteredFeedbacks = targetData.solved.map((solved, idx) => solved ? null : feedbacks[idx]);
+
+        s.ws.send(JSON.stringify({
+        type: 'update',
+        guesser: playerId,
+        guess,
+        feedbacks: filteredFeedbacks, // null for solved boards
+        solvedCount: targetData.solvedCount,
+        fromYou
+        }));
+      });
+
 
         if(playerData.solvedCount===room.answers.length){
           room.sockets.forEach(s=>{
