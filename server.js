@@ -1623,9 +1623,11 @@ wss.on('connection', function(ws, req){
         room.sockets.forEach(s => {
         const fromYou = (s.playerId === playerId);
         const targetData = room.playersData[s.playerId];
-
+              
+        // Send full feedback for boards the player hasn't solved yet
         const filteredFeedbacks = feedbacks.map((fb, idx) => {
-          return targetData.solved[idx] ? undefined : fb; // undefined for solved boards
+          // always send feedback for this board if it is NOT solved for the recipient
+          return targetData.solved[idx] ? undefined : fb;
         });
       
         s.ws.send(JSON.stringify({
@@ -1637,6 +1639,7 @@ wss.on('connection', function(ws, req){
           fromYou
         }));
       });
+
 
 
 

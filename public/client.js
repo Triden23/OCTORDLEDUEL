@@ -98,13 +98,16 @@
         else if(data.type==='update'){
           const {guess, feedbacks, fromYou} = data;
           feedbacks.forEach((fb, b) => {
-          if (!fb) return; // skip boards that are already solved
-            const boardState = fromYou ? yourState : oppState;
-            const attempts = boardState.attemptsPerBoard[b].length;
-            boardState.attemptsPerBoard[b].push({ guess, feedback: fb });
-            if (fb.every(c => c === 'g')) boardState.solved[b] = true;
-              applyFeedback(b, attempts, guess, fb, fromYou);
-          });
+          if (!fb) return; // skip boards already solved
+          const boardState = fromYou ? yourState : oppState;
+          const attempts = boardState.attemptsPerBoard[b].length;
+          boardState.attemptsPerBoard[b].push({ guess, feedback: fb });
+          applyFeedback(b, attempts, guess, fb, fromYou);
+                  
+          // mark solved **after applying feedback**
+          if (fb.every(c => c === 'g')) boardState.solved[b] = true;
+        });
+
 
           if(fromYou){ yourState.solvedCount=data.solvedCount; } else { oppState.solvedCount=data.solvedCount; }
           updateScores();
