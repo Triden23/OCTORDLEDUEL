@@ -1612,7 +1612,7 @@ wss.on('connection', function (ws, req) {
           const fb = getFeedback(guess, answer);
           playerData.attemptsPerBoard[i].push({ guess, feedback: fb });
 
-          // Mark board as solved for this player AFTER this guess
+          // Mark board as solved AFTER this guess
           if (fb.every(c => c === 'g') && !playerData.solved[i]) {
             playerData.solved[i] = true;
             playerData.solvedCount++;
@@ -1626,11 +1626,11 @@ wss.on('connection', function (ws, req) {
           const fromYou = (s.playerId === playerId);
           const targetData = room.playersData[s.playerId];
 
-          // Only send feedback for boards that are unsolved from the receiver's perspective
           const filteredFeedbacks = feedbacks.map((fb, idx) => {
-            if (fromYou) return fb; // always show your own boards
-            // For opponent: only send feedback if the board is NOT yet solved on THEIR side
-            return !targetData.solved[idx] ? fb : null;
+            // Show the current guess feedback for all boards that were NOT solved BEFORE this guess
+            if (fromYou) return fb;
+            if (!targetData.solved[idx] || fb.every(c => c === 'g')) return fb;
+            return null; // skip future updates for already solved boards
           });
 
           s.ws.send(JSON.stringify({
@@ -1643,7 +1643,7 @@ wss.on('connection', function (ws, req) {
           }));
         });
 
-        // Check if the player finished all boards
+        // Finish game if player completed all boards
         if (playerData.solvedCount === room.answers.length) {
           room.sockets.forEach(s => {
             s.ws.send(JSON.stringify({
@@ -1654,6 +1654,7 @@ wss.on('connection', function (ws, req) {
           });
         }
       }
+
 
 
     } catch (e) {
