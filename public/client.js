@@ -72,7 +72,7 @@
     }
   }
 
-  function connect(room) {
+    function connect(room) {
     const loc = window.location;
     const wsUrl = `ws://${loc.hostname}:8080/?room=${encodeURIComponent(room)}`;
     ws = new WebSocket(wsUrl);
@@ -111,10 +111,6 @@
             if (fb.every(c => c === 'g')) boardState.solved[b] = true;
           });
 
-
-
-
-
           if (fromYou) { yourState.solvedCount = data.solvedCount; } else { oppState.solvedCount = data.solvedCount; }
           updateScores();
           if (fromYou) addMsg(`${data.guesser} guessed "${guess.toUpperCase()}"`);
@@ -142,4 +138,49 @@
   const r = urlParams.get('room');
   if (r) roomInput.value = r;
 
+})();
+
+// === On-Screen Keyboard Integration ===
+(() => {
+  const keyboardLayout = [
+    "q w e r t y u i o p".split(" "),
+    "a s d f g h j k l".split(" "),
+    ["Enter", ..."zxcvbnm".split(""), "Back"]
+  ];
+
+  const keyboardContainer = document.getElementById("keyboard");
+  const guessInput = document.getElementById("guessInput");
+  const guessBtn = document.getElementById("guessBtn");
+
+  function createKeyboard() {
+    keyboardLayout.forEach(row => {
+      const rowDiv = document.createElement("div");
+      rowDiv.classList.add("keyboard-row");
+
+      row.forEach(key => {
+        const btn = document.createElement("button");
+        btn.classList.add("key");
+        btn.textContent = key;
+        btn.dataset.key = key;
+        btn.onclick = onKeyClick;
+        rowDiv.appendChild(btn);
+      });
+
+      keyboardContainer.appendChild(rowDiv);
+    });
+  }
+
+  function onKeyClick(e) {
+    const key = e.target.dataset.key;
+
+    if (key === "Enter") {
+      guessBtn.click(); // same as hitting Guess
+    } else if (key === "Back") {
+      guessInput.value = guessInput.value.slice(0, -1);
+    } else if (key.length === 1 && guessInput.value.length < 5) {
+      guessInput.value += key.toLowerCase();
+    }
+  }
+
+  createKeyboard();
 })();

@@ -39,3 +39,46 @@ h1{margin:6px 0 12px;font-size:20px;}
 #messages{margin-top:8px;color:var(--muted)}
 .hidden{display:none}
 #footer{margin-top:18px;color:var(--muted)}
+.keyboard {
+  display: grid;
+  grid-template-rows: repeat(3, auto);
+  gap: 6px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.key {
+  background-color: #d3d6da;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.2s;
+}
+
+.key.correct {
+  background-color: #6aaa64;
+  color: white;
+}
+
+.key.present {
+  background-color: #c9b458;
+  color: white;
+}
+
+.key.absent {
+  background-color: #787c7e;
+  color: white;
+}
+
+.key:active {
+  transform: scale(0.95);
+}
