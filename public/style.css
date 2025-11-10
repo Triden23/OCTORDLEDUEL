@@ -54,14 +54,30 @@ h1{margin:6px 0 12px;font-size:20px;}
 }
 
 .key {
-  background-color: #d3d6da;
-  border: none;
-  border-radius: 4px;
-  padding: 10px 12px;
-  font-weight: bold;
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 2px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  padding: 6px;
+  background-color: #222;
+  color: white;
   cursor: pointer;
-  text-transform: uppercase;
-  transition: background-color 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.key .seg {
+  flex: 1;
+  height: 10px;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5px;
 }
 
 .key.correct {
