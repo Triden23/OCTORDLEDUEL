@@ -113,9 +113,7 @@
 
           if (fromYou) { yourState.solvedCount = data.solvedCount; } else { oppState.solvedCount = data.solvedCount; }
           updateScores();
-          applyFeedbackToKeyboard(data.guess, data.feedbacks);
-
-          //if (fromYou) addMsg(`${data.guesser} guessed "${guess.toUpperCase()}"`);
+          if (fromYou) addMsg(`${data.guesser} guessed "${guess.toUpperCase()}"`);
         }
         else if (data.type === 'finish') { addMsg(data.message); }
         else if (data.type === 'opponentLeft') { setStatus('Opponent disconnected'); addMsg('Opponent left'); }
@@ -185,60 +183,4 @@
   }
 
   createKeyboard();
-  // === Keyboard Feedback Coloring ===
-const boardCount = document.querySelectorAll('.board').length;
-const keyStates = {}; // { letter: [statePerBoard] }, state = 'g','y','b', or null
-
-// Create per-segment visuals
-function createSegmentedKeys() {
-  document.querySelectorAll('.key').forEach(key => {
-    const letter = key.dataset.key.toLowerCase();
-    if (letter.length === 1) {
-      key.innerHTML = ''; // clear
-      for (let i = 0; i < boardCount; i++) {
-        const seg = document.createElement('div');
-        seg.classList.add('seg');
-        key.appendChild(seg);
-      }
-      keyStates[letter] = Array(boardCount).fill(null);
-    }
-  });
-}
-
-function updateKeyboardColors() {
-  for (const [letter, states] of Object.entries(keyStates)) {
-    const key = document.querySelector(`.key[data-key="${letter}"]`);
-    if (!key) continue;
-    key.querySelectorAll('.seg').forEach((seg, i) => {
-      const s = states[i];
-      seg.style.backgroundColor =
-        s === 'g' ? '#6aaa64' :
-        s === 'y' ? '#c9b458' :
-        s === 'b' ? '#3a3a3c' :
-        '#222';
-    });
-  }
-}
-
-// When new feedback comes in:
-function applyFeedbackToKeyboard(guess, feedbacks) {
-  feedbacks.forEach((fb, boardIndex) => {
-    if (!fb) return;
-    fb.forEach((f, i) => {
-      const letter = guess[i];
-      if (!keyStates[letter]) return;
-      const prev = keyStates[letter][boardIndex];
-
-      // update priority: green > yellow > gray
-      const rank = { g: 3, y: 2, b: 1, null: 0 };
-      if (rank[f] > rank[prev]) {
-        keyStates[letter][boardIndex] = f;
-      }
-    });
-  });
-  updateKeyboardColors();
-}
-
-createSegmentedKeys();
-updateKeyboardColors();
 })();
