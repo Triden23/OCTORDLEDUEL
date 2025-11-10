@@ -1,5 +1,33 @@
 (() => {
+  /*
+  Fix color on board, not constistent
+  Fix key not removing white color if not on a key.
 
+  Keyboard color, could be changed.
+  Try making a grid of color instead of rows.
+
+  Certain boards stop updating
+
+  Put word entry at the bottom and the top of the screen just the clickable at the top.
+  Center it
+
+  Tick box to hide the opponent Boxes
+
+  Add a line break every 2 rows to help distinguish
+
+  Add a guess count
+
+  Larger amounts do stacked layout. (above 8)
+
+  Increase keyboard size
+
+  Add brief popup to show word not in list like 1 seconds and focus that.
+
+  ---------------------------------------------------------------------------------------
+  Wordle
+
+
+*/
   //<select id="boardSelect"></select>
   const statusEl = document.getElementById('status');
   const joinBtn = document.getElementById('joinBtn');
