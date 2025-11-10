@@ -117,7 +117,7 @@
 
           if (fromYou) { yourState.solvedCount = data.solvedCount; } else { oppState.solvedCount = data.solvedCount; }
           updateScores();
-          if (fromYou) addMsg(`${data.guesser} guessed "${guess.toUpperCase()}"`);
+          //if (fromYou) addMsg(`${data.guesser} guessed "${guess.toUpperCase()}"`);
         }
         else if (data.type === 'finish') { addMsg(data.message); }
         else if (data.type === 'opponentLeft') { setStatus('Opponent disconnected'); addMsg('Opponent left'); }
