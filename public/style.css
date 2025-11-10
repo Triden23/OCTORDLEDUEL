@@ -64,6 +64,7 @@ h1{margin:6px 0 12px;font-size:20px;}
   text-transform: uppercase;
   transition: background-color 0.2s;
   overflow: hidden;
+  z-index: 0;
 }
 
 .key-slices {
@@ -73,11 +74,13 @@ h1{margin:6px 0 12px;font-size:20px;}
   grid-template-columns: repeat(8, 1fr);
   pointer-events: none;
   border-radius: 4px;
+  z-index: -1; /* <<< puts slices behind the text */
 }
 
 .slice {
   width: 100%;
   height: 100%;
+  background: #fff;
 }
 
 .key.correct {

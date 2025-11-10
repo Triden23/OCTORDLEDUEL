@@ -69,6 +69,10 @@
         tile.classList.add(feedback[i]); // colors only
         tile.innerText = '';
       }
+
+      if (fromYou && typeof updateKeyboardColors === 'function') {
+       updateKeyboardColors(guess, feedback, board);
+     }
     }
   }
 
