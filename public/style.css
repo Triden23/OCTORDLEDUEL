@@ -46,6 +46,9 @@ h1{margin:6px 0 12px;font-size:20px;}
   justify-content: center;
   margin-top: 20px;
 }
+#keyboard.hidden {
+  display: none;
+}
 
 .keyboard-row {
   display: flex;
