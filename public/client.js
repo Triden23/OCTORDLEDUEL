@@ -96,6 +96,7 @@
           setStatus(data.message);
           gameArea.classList.remove('hidden');
           document.getElementById('inputArea').classList.remove('hidden');
+          document.getElementById('keyboard').classList.remove('hidden');
           addMsg('Game started!');
         }
         else if (data.type === 'invalid') {
