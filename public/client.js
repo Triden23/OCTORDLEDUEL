@@ -140,17 +140,19 @@
 
 })();
 
-// === On-Screen Keyboard Integration ===
 (() => {
   const keyboardLayout = [
     "q w e r t y u i o p".split(" "),
     "a s d f g h j k l".split(" "),
-    ["Enter", ..."zxcvbnm".split(""), "Back"]
+    ["Back", ..."zxcvbnm".split(""), "Enter"]
   ];
 
   const keyboardContainer = document.getElementById("keyboard");
   const guessInput = document.getElementById("guessInput");
   const guessBtn = document.getElementById("guessBtn");
+
+  const boardCount = 8; // adjust dynamically later if you change boardCount in your game
+  const keyStates = {}; // keyStates[key][boardIndex] = 'g'|'y'|'b'|null
 
   function createKeyboard() {
     keyboardLayout.forEach(row => {
@@ -162,6 +164,18 @@
         btn.classList.add("key");
         btn.textContent = key;
         btn.dataset.key = key;
+        // create slices container
+        if (key.length === 1 && /[a-z]/.test(key)) {
+          const slices = document.createElement("div");
+          slices.classList.add("key-slices");
+          for (let i = 0; i < boardCount; i++) {
+            const slice = document.createElement("div");
+            slice.classList.add("slice");
+            slice.style.background = "#fff";
+            slices.appendChild(slice);
+          }
+          btn.appendChild(slices);
+        }
         btn.onclick = onKeyClick;
         rowDiv.appendChild(btn);
       });
@@ -172,15 +186,39 @@
 
   function onKeyClick(e) {
     const key = e.target.dataset.key;
-
     if (key === "Enter") {
-      guessBtn.click(); // same as hitting Guess
+      guessBtn.click();
     } else if (key === "Back") {
       guessInput.value = guessInput.value.slice(0, -1);
     } else if (key.length === 1 && guessInput.value.length < 5) {
       guessInput.value += key.toLowerCase();
     }
   }
+
+  // called when new feedback arrives
+  window.updateKeyboardColors = function(guess, feedback, boardIndex) {
+    for (let i = 0; i < 5; i++) {
+      const letter = guess[i];
+      const fb = feedback[i];
+      const btn = document.querySelector(`.key[data-key="${letter}"]`);
+      if (!btn) continue;
+
+      // store and update color per board
+      if (!keyStates[letter]) keyStates[letter] = Array(boardCount).fill(null);
+      keyStates[letter][boardIndex] = fb;
+
+      // update slice visuals
+      const slices = btn.querySelectorAll(".slice");
+      slices.forEach((s, idx) => {
+        const state = keyStates[letter][idx];
+        let color = "#fff";
+        if (state === "g") color = "var(--green)";
+        else if (state === "y") color = "var(--yellow)";
+        else if (state === "b") color = "var(--gray)";
+        s.style.background = color;
+      });
+    }
+  };
 
   createKeyboard();
 })();
