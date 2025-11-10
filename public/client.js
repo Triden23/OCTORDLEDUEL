@@ -1,4 +1,6 @@
 (() => {
+
+  //<select id="boardSelect"></select>
   const statusEl = document.getElementById('status');
   const joinBtn = document.getElementById('joinBtn');
   const roomInput = document.getElementById('roomInput');
