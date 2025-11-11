@@ -16,14 +16,24 @@
       <div id="status">Not connected</div>
     </div>
 
+    <div id="inputArea" class="hidden">
+      <div>
+        <label for = "show"> Show Opponent</label>
+        <input type="checkbox" id="show" name="show" value="Bike" checked>
+        <input id="guessInput" maxlength="5" placeholder="enter 5-letter guess"/>
+        <button id="guessBtn">Guess</button>
+      </div>
+      <div id="messages"></div>
+    </div>
+
     <div id="gameArea" class="hidden">
       <div id="youColumn" class="column">
-        <h2>You <span id="youScore">0/8</span></h2>
+        <h2>You <span id="youScore">0/8</span> <span style="float: right;">Guesses <span id = "youGuess" >0/13</span></h2>
         <div id="yourBoards" class="boards"></div>
       </div>
 
       <div id="opColumn" class="column">
-        <h2>Opponent <span id="opScore">0/8</span></h2>
+        <h2>Opponent <span id="opScore">0/8</span><span style="float: right;">Guesses <span id = "opGuess" >0/13</span></h2>
         <div id="oppBoards" class="boards"></div>
       </div>
     </div>
@@ -31,8 +41,8 @@
     <div id="inputArea" class="hidden">
       <div>Select board:
         
-        <input id="guessInput" maxlength="5" placeholder="enter 5-letter guess"/>
-        <button id="guessBtn">Guess</button>
+        <input id="guessInput2" maxlength="5" placeholder="enter 5-letter guess"/>
+        <button id="guessBtn2">Guess</button>
       </div>
       <div id="messages"></div>
     </div>

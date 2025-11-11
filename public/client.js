@@ -11,11 +11,11 @@
   Put word entry at the bottom and the top of the screen just the clickable at the top.
   Center it
 
-  Tick box to hide the opponent Boxes
+  Tick box to hide the opponent Boxes - DONE
 
-  Add a line break every 2 rows to help distinguish
+  Add a line break every 2 rows to help distinguish //Working on - need some googling
 
-  Add a guess count
+  Add a guess count //Working on
 
   Larger amounts do stacked layout. (above 8)
 
@@ -40,8 +40,12 @@
   const messages = document.getElementById('messages');
   const youScore = document.getElementById('youScore');
   const opScore = document.getElementById('opScore');
+  const youGuess = document.getElementById('youGuess');
+  const opGuess = document.getElementById('opGuess');
+  const opCol = document.getElementById('opColumn');
+  const showOp = document.getElementById('show');
 
-  let ws, playerId, boardCount = 8, maxGuesses = 13;
+  let ws, playerId, boardCount = 8, maxGuesses = 13, youCurrentGuess = 0, opCurrentGuess = 0;
   let yourState, oppState;
 
   function setStatus(s) { statusEl.innerText = s; }
@@ -66,6 +70,7 @@
         for (let c = 0; c < 5; c++) { const t = document.createElement('div'); t.className = 'tile'; t.innerText = ''; row.appendChild(t); }
         bd.appendChild(row);
       }
+      if((b+1)%2==0){bd.style.paddingBottom = '50px';}
       yourBoardsEl.appendChild(bd);
 
       // Opponent board
@@ -75,6 +80,8 @@
         for (let c = 0; c < 5; c++) { const t = document.createElement('div'); t.className = 'tile'; t.innerText = ''; row.appendChild(t); }
         obd.appendChild(row);
       }
+      if((b+1)%2==0){console.log("HIT");}
+      if((b+1)%2==0){obd.style.paddingBottom = '50px';}
       oppBoardsEl.appendChild(obd);
     }
   }
@@ -82,6 +89,11 @@
   function updateScores() {
     youScore.innerText = `${yourState.solvedCount}/${boardCount}`;
     opScore.innerText = `${oppState.solvedCount}/${boardCount}`;
+  }
+
+  function updateGuesses() {
+    youGuess.innerText = `${youCurrentGuess}/${maxGuesses}`;
+    opGuess.innerText = `${opCurrentGuess}/${maxGuesses}`;
   }
 
   function applyFeedback(board, attemptIndex, guess, feedback, fromYou) {
@@ -141,16 +153,17 @@
             // Apply this guess
             boardState.attemptsPerBoard[b].push({ guess, feedback: fb });
             applyFeedback(b, attempts, guess, fb, fromYou);
-
             // Mark as solved after applying the guess
             if (fb.every(c => c === 'g')) boardState.solved[b] = true;
           });
 
           if (fromYou) { yourState.solvedCount = data.solvedCount; } else { oppState.solvedCount = data.solvedCount; }
           updateScores();
+          if (fromYou) { youCurrentGuess += 1;} else { opCurrentGuess += 1;}
+          updateGuesses();
           //if (fromYou) addMsg(`${data.guesser} guessed "${guess.toUpperCase()}"`);
         }
-        else if (data.type === 'finish') { addMsg(data.message); }
+        //else if (data.type === 'finish') { addMsg(data.message); }
         else if (data.type === 'opponentLeft') { setStatus('Opponent disconnected'); addMsg('Opponent left'); }
       } catch (e) { console.error(e); }
     };
@@ -160,12 +173,33 @@
 
   guessBtn.onclick = sendGuess;
   guessInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendGuess(); });
-
+  showOp.addEventListener('change', function() {
+    // 'this' refers to the checkbox element within the callback function
+    if (this.checked) {
+        showsOp();
+        // Perform actions when the checkbox is checked
+    } else {
+        hidesOp();
+    }
+  });
   function sendGuess() {
     const guess = (guessInput.value || '').trim().toLowerCase();
     if (!guess || guess.length !== 5) { addMsg('Guess must be 5 letters'); return; }
     ws.send(JSON.stringify({ type: 'guess', guess }));
     guessInput.value = '';
+  }
+
+  function showsOp(){
+    opCol.style.visibility = 'visible';
+    //oppBoardsEl.style.visibility = 'visible';
+    //opScore.style.visibility = "visible";
+    
+  }
+
+  function hidesOp(){
+    opCol.style.visibility = 'hidden';
+    //oppBoardsEl.style.visibility = 'hidden';
+    //opScore.style.visibility = "hidden";
   }
 
   // Auto-connect if room in URL
