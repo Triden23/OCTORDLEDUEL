@@ -57,6 +57,8 @@
     
     messages.appendChild(p);
     messages.scrollTop = messages.scrollHeight;
+    p = document.createElement('div');
+    p.innerText = m;
     messages2.appendChild(p);
     messages2.scrollTop = messages.scrollHeight;
   }
