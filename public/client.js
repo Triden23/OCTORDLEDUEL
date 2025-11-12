@@ -63,16 +63,16 @@
 
   function setStatus(s) { statusEl.innerText = s; }
   function addMsg(m) {
-  const p1 = document.createElement('div');
-  p1.innerText = m;
-  messages.appendChild(p1);
-  messages.scrollTop = messages.scrollHeight;
+    const p1 = document.createElement('div');
+    p1.innerText = m;
+    messages.appendChild(p1);
+    messages.scrollTop = messages.scrollHeight;
 
-  const p2 = document.createElement('div');
-  p2.innerText = m;
-  messages2.appendChild(p2);
-  messages2.scrollTop = messages2.scrollHeight;
-}
+    const p2 = document.createElement('div');
+    p2.innerText = m;
+    messages2.appendChild(p2);
+    messages2.scrollTop = messages2.scrollHeight;
+  }
 
   function makeBoards(n) {
     yourBoardsEl.innerHTML = '';
@@ -246,7 +246,8 @@
         else if (data.type === 'opponentLeft') {
           setStatus('Opponent disconnected');
           addMsg('Opponent left — refreshing...');
-          window.location.reload(true);
+          // wait a moment so the user sees the message, then reload
+          setTimeout(() => window.location.reload(), 1500);
         }
       } catch (e) { console.error(e); }
     };
