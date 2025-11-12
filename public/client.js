@@ -251,6 +251,21 @@
         }
       } catch (e) { console.error(e); }
     };
+
+    ws.onclose = (event) => {
+    console.log("Connection closed:", event);
+    setStatus("Disconnected from server");
+    addMsg("Lost connection to server — refreshing...");
+    // Optional: reload after a short delay
+    setTimeout(() => window.location.reload(), 1500);
+};
+
+ws.onerror = (error) => {
+    console.error("WebSocket error:", error);
+    setStatus("Connection error");
+    addMsg("WebSocket encountered an error.");
+    setTimeout(() => window.location.reload(), 1500);
+};
   }
 
   joinBtn.onclick = () => { const r = roomInput.value.trim() || 'default'; connect(r); };
