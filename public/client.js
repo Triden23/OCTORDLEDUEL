@@ -161,8 +161,21 @@
   }
 
   function updateGuesses() {
-    youGuess.innerText = `${youCurrentGuess}/${maxGuesses}`;
-    opGuess.innerText = `${opCurrentGuess}/${maxGuesses}`;
+    var text = "";
+    if(youCurrentGuess => maxGuesses){
+      text = `${maxGuesses}/${maxGuesses}`;
+    }else{
+      text = `${youCurrentGuess}/${maxGuesses}`;
+    }
+    youGuess.innerText = '${text}';
+    if(opCurrentGuess => maxGuesses){
+      text = `${maxGuesses}/${maxGuesses}`;
+    }else{
+      text = `${opCurrentGuess}/${maxGuesses}`;
+    }
+    
+    opGuess.innerText = '${text}';
+    
   }
 
   function applyFeedback(board, attemptIndex, guess, feedback, fromYou) {
