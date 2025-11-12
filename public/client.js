@@ -42,7 +42,10 @@
   ---------------------------------------------------------------------------------------
   Amount of Kila fixes = 16
   Amount of fixes = 2
-
+  ---------------------------------------------------------------------------------------
+  Floating keyboard
+  react.js - Look into
+  
 
 */
   //<select id="boardSelect"></select>
@@ -105,7 +108,6 @@
     const spacerHeight = tileSize / 2;
 
     for (let b = 0; b < n; b += 2) {
-      // --- Your boards pair ---
       const yourPair = document.createElement('div');
       yourPair.className = 'board-pair';
 
@@ -139,7 +141,6 @@
         yourBoardsEl.appendChild(spacer);
       }
 
-      // --- Opponent boards pair ---
       const oppPair = document.createElement('div');
       oppPair.className = 'board-pair';
 
@@ -181,7 +182,6 @@
   }
 
   function updateGuesses() {
-    // Clamp guesses to maxGuesses
     const youDisplay = Math.min(youCurrentGuess, maxGuesses);
     const opDisplay = Math.min(opCurrentGuess, maxGuesses);
 
@@ -271,7 +271,6 @@
         else if (data.type === 'opponentLeft') {
           setStatus('Opponent disconnected');
           addMsg('Opponent left — refreshing...');
-          // wait a moment so the user sees the message, then reload
           setTimeout(() => window.location.reload(), 1500);
         }
       } catch (e) { console.error(e); }
@@ -281,7 +280,6 @@
       console.log("Connection closed:", event);
       setStatus("Disconnected from server");
       addMsg("Lost connection to server — refreshing...");
-      // Optional: reload after a short delay
       setTimeout(() => window.location.reload(), 1500);
     };
 
@@ -362,8 +360,8 @@
   const guessBtn = document.getElementById("guessBtn");
   const guessBtn2 = document.getElementById("guessBtn2");
 
-  const boardCount = 8; // adjust dynamically later if you change boardCount in your game
-  const keyStates = {}; // keyStates[key][boardIndex] = 'g'|'y'|'b'|null
+  const boardCount = 8;
+  const keyStates = {};
 
   function createKeyboard() {
     keyboardLayout.forEach(row => {
