@@ -1598,17 +1598,81 @@ wss.on('connection', function (ws, req) {
   ws.on('message', function (raw) {
     try {
       const data = JSON.parse(raw);
-
       if (data.type === 'guess') {
+        const guess = data.guess.trim().toLowerCase(); // ✅ move this up first
+        const playerData = room.playersData[playerId]; // ✅ define before using it
 
+        // ✅ Prevent reusing the same guess
         const alreadyGuessed = playerData.attemptsPerBoard.some(board =>
           board.some(attempt => attempt.guess === guess)
         );
-
         if (alreadyGuessed) {
           ws.send(JSON.stringify({ type: 'invalid', message: 'You already used that word!' }));
           return;
         }
+
+        // ✅ Check if the word is valid
+        if (!WORDS.includes(guess)) {
+          ws.send(JSON.stringify({ type: 'invalid', message: 'Word not in word list!' }));
+          return;
+        }
+
+        // ✅ Remember solved state BEFORE this guess
+        const solvedBefore = [...playerData.solved];
+
+        // ✅ Compute feedback for all boards
+        const feedbacks = room.answers.map((answer, i) => {
+          const fb = getFeedback(guess, answer);
+          playerData.attemptsPerBoard[i].push({ guess, feedback: fb });
+
+          // Mark as solved for this player if correct
+          if (fb.every(c => c === 'g') && !playerData.solved[i]) {
+            playerData.solved[i] = true;
+            playerData.solvedCount++;
+          }
+
+          return fb;
+        });
+
+        // ✅ Send updates to each player
+        room.sockets.forEach(s => {
+          const fromYou = (s.playerId === playerId);
+          const targetData = room.playersData[s.playerId];
+
+          const filteredFeedbacks = feedbacks.map((fb, idx) => {
+            // Send feedback if this board was NOT solved BEFORE this guess
+            if (!fb) return null;
+            return solvedBefore[idx] ? null : fb;
+          });
+
+          s.ws.send(JSON.stringify({
+            type: 'update',
+            guesser: playerId,
+            guess,
+            feedbacks: filteredFeedbacks,
+            solvedCount: fromYou
+              ? targetData.solvedCount      // your own solved count
+              : playerData.solvedCount,     // opponent solved count
+            fromYou
+          }));
+        });
+
+        // ✅ Check for finished game
+        if (playerData.solvedCount === room.answers.length) {
+          room.sockets.forEach(s => {
+            s.ws.send(JSON.stringify({
+              type: 'finish',
+              winner: playerId,
+              message: playerId === s.playerId
+                ? 'You finished all words! You win!'
+                : 'Opponent finished all words.'
+            }));
+          });
+        }
+      }
+      /*if (data.type === 'guess') {
+
+        
         const guess = data.guess.trim().toLowerCase();
         if (!WORDS.includes(guess)) {
           ws.send(JSON.stringify({ type: 'invalid', message: 'Word not in word list!' }));
@@ -1646,15 +1710,15 @@ wss.on('connection', function (ws, req) {
           });
 
           s.ws.send(JSON.stringify({
-            type: 'update',
-            guesser: playerId,
-            guess,
-            feedbacks: filteredFeedbacks,
-            solvedCount: fromYou
-              ? targetData.solvedCount             // your own solved count
-              : playerData.solvedCount,           // opponent solved count
-            fromYou
-          }));
+    type: 'update',
+    guesser: playerId,
+    guess,
+    feedbacks: filteredFeedbacks,
+    solvedCount: fromYou
+      ? targetData.solvedCount             // your own solved count
+      : playerData.solvedCount,           // opponent solved count
+    fromYou
+  }));
         });
 
         // Check for finished game
@@ -1669,7 +1733,7 @@ wss.on('connection', function (ws, req) {
             }));
           });
         }
-      }
+      }*/
 
     } catch (e) {
       console.error('Error parsing message', e);
