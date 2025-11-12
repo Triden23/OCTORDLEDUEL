@@ -37,10 +37,10 @@
 
   Guess count can keep going - DONE
   Top keyboard bug - DONE - MAYBE DONE
-  Limit messages to 5 - WIP
+  Limit messages to 3 - Done
 
   ---------------------------------------------------------------------------------------
-  Wordle
+  Amount of bug fixes 
 
 
 */
