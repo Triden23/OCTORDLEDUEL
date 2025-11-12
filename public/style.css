@@ -88,6 +88,8 @@ h1{margin:6px 0 12px;font-size:20px;}
 }
 #messages{margin-top:8px;color:var(--muted)}
 .hidden{display:none}
+#messages2{margin-top:8px;color:var(--muted)}
+
 #footer{margin-top:18px;color:var(--muted)}
 .keyboard {
   display: grid;
