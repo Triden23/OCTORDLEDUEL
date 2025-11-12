@@ -246,7 +246,7 @@
         else if (data.type === 'opponentLeft') {
           setStatus('Opponent disconnected');
           addMsg('Opponent left — refreshing...');
-          window.location.reload
+          window.location.reload(true);
         }
       } catch (e) { console.error(e); }
     };
