@@ -72,24 +72,26 @@
   function addMsg(m) {
     const p1 = document.createElement('div');
     p1.innerText = m;
+    p1.style.color = 'var(--muted)'; // force color
     messages.appendChild(p1);
 
     // Keep only the last 5 messages
     while (messages.children.length > 3) {
-        messages.removeChild(messages.firstChild);
+      messages.removeChild(messages.firstChild);
     }
     messages.scrollTop = messages.scrollHeight;
 
     const p2 = document.createElement('div');
     p2.innerText = m;
+    p2.style.color = 'var(--muted)'; // force color
     messages2.appendChild(p2);
 
     // Keep only the last 5 messages
     while (messages2.children.length > 3) {
-        messages2.removeChild(messages2.firstChild);
+      messages2.removeChild(messages2.firstChild);
     }
     messages2.scrollTop = messages2.scrollHeight;
-}
+  }
 
   function makeBoards(n) {
     yourBoardsEl.innerHTML = '';
@@ -184,7 +186,7 @@
 
     youGuess.innerText = `${youDisplay}/${maxGuesses}`;
     opGuess.innerText = `${opDisplay}/${maxGuesses}`;
-}
+  }
 
   function applyFeedback(board, attemptIndex, guess, feedback, fromYou) {
     const bd = document.getElementById(fromYou ? `your-board-${board}` : `opp-board-${board}`);
