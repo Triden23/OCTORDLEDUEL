@@ -40,7 +40,8 @@
   Limit messages to 3 - Done
 
   ---------------------------------------------------------------------------------------
-  Amount of bug fixes 
+  Amount of Kila fixes = 16
+  Amount of fixes = 2
 
 
 */
