@@ -186,6 +186,7 @@
       }
     }
   }
+  //Tests
 
   function connect(room) {
     const loc = window.location;
