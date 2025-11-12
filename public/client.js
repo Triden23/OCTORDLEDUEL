@@ -162,13 +162,13 @@
 
   function updateGuesses() {
     var text = "";
-    if(youCurrentGuess =< maxGuesses){
+    if(youCurrentGuess <= maxGuesses){
       text = `${maxGuesses}/${maxGuesses}`;
     }else{
       text = `${youCurrentGuess}/${maxGuesses}`;
     }
     youGuess.innerText = text;
-    if(opCurrentGuess =< maxGuesses){
+    if(opCurrentGuess <= maxGuesses){
       text = `${maxGuesses}/${maxGuesses}`;
     }else{
       text = `${opCurrentGuess}/${maxGuesses}`;
