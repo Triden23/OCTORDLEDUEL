@@ -1,27 +1,25 @@
 (() => {
   /*
-  Fix color on board, not constistent
-  Fix key not removing white color if not on a key.
+  Fix color on board, not constistent - DONE
+  Fix key not removing white color if not on a key. - DONE
 
-  Keyboard color, could be changed.
-  Try making a grid of color instead of rows.
+  Keyboard color, could be changed. - DONE
+  Try making a grid of color instead of rows. - DONE
 
-  Certain boards stop updating
+  Certain boards stop updating - DONE
 
   Put word entry at the bottom and the top of the screen just the clickable at the top.
-  Center it
+  Center it - DONE
 
   Tick box to hide the opponent Boxes - DONE
 
-  Add a line break every 2 rows to help distinguish //Working on - need some googling
+  Add a line break every row - DONE
 
-  Add a guess count //Working on
+  Add a guess count - DONE
 
-  Larger amounts do stacked layout. (above 8) - research custom layout manager
+  Increase keyboard size - DONE
 
-  Increase keyboard size
-
-  Add brief popup to show word not in list like 1 seconds and focus that.
+  Add brief popup to show word not in list like 1 seconds and focus that. - MAYBE
 
   ---------------------------------------------------------------------------------------
   Wordle
@@ -62,34 +60,6 @@
     messages2.appendChild(p);
     messages2.scrollTop = messages.scrollHeight;
   }
-
-  /*function makeBoards(n) {
-    yourBoardsEl.innerHTML = '';
-    oppBoardsEl.innerHTML = '';
-    yourState = { attemptsPerBoard: Array.from({ length: n }, () => []), solved: Array.from({ length: n }, () => false), solvedCount: 0 };
-    oppState = { attemptsPerBoard: Array.from({ length: n }, () => []), solved: Array.from({ length: n }, () => false), solvedCount: 0 };
-
-    for (let b = 0; b < n; b++) {
-      // Your board
-      const bd = document.createElement('div'); bd.className = 'board'; bd.id = `your-board-${b}`;
-      for (let r = 0; r < maxGuesses; r++) {
-        const row = document.createElement('div'); row.className = 'row';
-        for (let c = 0; c < 5; c++) { const t = document.createElement('div'); t.className = 'tile'; t.innerText = ''; row.appendChild(t); }
-        bd.appendChild(row);
-      }
-      if((b+1)%2==0){bd.style.paddingBottom = '50px';}
-      yourBoardsEl.appendChild(bd);
-
-      // Opponent board
-      const obd = document.createElement('div'); obd.className = 'board'; obd.id = `opp-board-${b}`;
-      for (let r = 0; r < maxGuesses; r++) {
-        const row = document.createElement('div'); row.className = 'row';
-        for (let c = 0; c < 5; c++) { const t = document.createElement('div'); t.className = 'tile'; t.innerText = ''; row.appendChild(t); }
-        obd.appendChild(row);
-      }
-      oppBoardsEl.appendChild(obd);
-    }
-  }*/
 
   function makeBoards(n) {
     yourBoardsEl.innerHTML = '';
@@ -230,60 +200,36 @@
         else if (data.type === 'invalid') {
           addMsg(data.message);
         }
-        /*else if (data.type === 'update') {
-          const { guess, feedbacks, fromYou } = data;
-          feedbacks.forEach((fb, b) => {
-            if (!fb) return; // skip boards that are already solved in previous guesses
-
-            const boardState = fromYou ? yourState : oppState;
-            const attempts = boardState.attemptsPerBoard[b].length;
-
-            // Apply this guess
-            boardState.attemptsPerBoard[b].push({ guess, feedback: fb });
-            applyFeedback(b, attempts, guess, fb, fromYou);
-            // Mark as solved after applying the guess
-            if (fb.every(c => c === 'g')) boardState.solved[b] = true;
-          });
-
-          if (fromYou) { yourState.solvedCount = data.solvedCount; } else { oppState.solvedCount = data.solvedCount; }
-          updateScores();
-          if (fromYou) { youCurrentGuess += 1; } else { opCurrentGuess += 1; }
-          updateGuesses();
-          //if (fromYou) addMsg(`${data.guesser} guessed "${guess.toUpperCase()}"`);
-        }*/
+    
         else if (data.type === 'update') {
           const { guess, feedbacks, fromYou } = data;
           const boardState = fromYou ? yourState : oppState;
 
           feedbacks.forEach((fb, boardIndex) => {
-            if (!fb) return; // skip boards with no feedback from server
+            if (!fb) return; 
 
             const attempts = boardState.attemptsPerBoard[boardIndex].length;
 
-            // Always apply feedback, even if the board is about to be solved
             boardState.attemptsPerBoard[boardIndex].push({ guess, feedback: fb });
             applyFeedback(boardIndex, attempts, guess, fb, fromYou);
 
-            // Only now mark the board as solved if this guess was all green
             if (!boardState.solved[boardIndex] && fb.every(c => c === 'g')) {
               boardState.solved[boardIndex] = true;
             }
           });
 
-          // Update solved counts and UI
           if (fromYou) { yourState.solvedCount = data.solvedCount; }
           else { oppState.solvedCount = data.solvedCount; }
 
           updateScores();
 
-          // Increment guess counter for the correct player
           if (fromYou) { youCurrentGuess += 1; }
           else { opCurrentGuess += 1; }
 
           updateGuesses();
         }
 
-        //else if (data.type === 'finish') { addMsg(data.message); }
+        else if (data.type === 'finish') { addMsg(data.message); }
         else if (data.type === 'opponentLeft') { setStatus('Opponent disconnected'); addMsg('Opponent left'); }
       } catch (e) { console.error(e); }
     };
@@ -294,10 +240,9 @@
   guessBtn.onclick = sendGuess;
   guessInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendGuess(); });
   showOp.addEventListener('change', function () {
-    // 'this' refers to the checkbox element within the callback function
+    
     if (this.checked) {
       showsOp();
-      // Perform actions when the checkbox is checked
     } else {
       hidesOp();
     }
@@ -321,18 +266,17 @@
   }
 
   function showsOp() {
-  opCol.style.display = 'block';  // or 'flex' if needed
-  youCol.style.margin = '';       // remove centering margin if you added it
+  opCol.style.display = 'block';  
+  youCol.style.margin = '';       
   gameArea.classList.remove('centered');
 }
 
 function hidesOp() {
   opCol.style.display = 'none';
-  youCol.style.margin = '0 auto';  // center You column
-  gameArea.classList.add('centered');  // optional for extra control
+  youCol.style.margin = '0 auto';
+  gameArea.classList.add('centered');
 }
 
-  // Auto-connect if room in URL
   const urlParams = new URLSearchParams(window.location.search);
   const r = urlParams.get('room');
   if (r) roomInput.value = r;
@@ -365,7 +309,7 @@ function hidesOp() {
         btn.classList.add("key");
         btn.textContent = key;
         btn.dataset.key = key;
-        // create slices container
+
         if (key.length === 1 && /[a-z]/.test(key)) {
           const slices = document.createElement("div");
           slices.classList.add("key-slices");
@@ -389,17 +333,17 @@ function hidesOp() {
     const key = e.target.dataset.key;
 
     if (key === "Enter") {
-      guessBtn.click();      // only trigger one button
+      guessBtn.click();      
       guessInput.value = "";
       guessInput2.value = "";
     }
     else if (key === "Back") {
-      // delete from both inputs at the same time
+      
       guessInput.value = guessInput.value.slice(0, -1);
       guessInput2.value = guessInput2.value.slice(0, -1);
     }
     else if (key.length === 1) {
-      // append letter to both inputs simultaneously
+      
       if (guessInput.value.length < 5) {
         guessInput.value += key.toLowerCase();
       }
@@ -410,7 +354,7 @@ function hidesOp() {
   }
 
 
-  // called when new feedback arrives
+  
   window.updateKeyboardColors = function (guess, feedback, boardIndex) {
     for (let i = 0; i < 5; i++) {
       const letter = guess[i];
@@ -418,11 +362,11 @@ function hidesOp() {
       const btn = document.querySelector(`.key[data-key="${letter}"]`);
       if (!btn) continue;
 
-      // store and update color per board
+
       if (!keyStates[letter]) keyStates[letter] = Array(boardCount).fill(null);
       keyStates[letter][boardIndex] = fb;
 
-      // update slice visuals
+
       const slices = btn.querySelectorAll(".slice");
       slices.forEach((s, idx) => {
         const state = keyStates[letter][idx];
