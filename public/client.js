@@ -167,14 +167,14 @@
     }else{
       text = `${youCurrentGuess}/${maxGuesses}`;
     }
-    youGuess.innerText = `${text}`;
+    youGuess.innerText = text;
     if(opCurrentGuess => maxGuesses){
       text = `${maxGuesses}/${maxGuesses}`;
     }else{
       text = `${opCurrentGuess}/${maxGuesses}`;
     }
     
-    opGuess.innerText = `${text}`;
+    opGuess.innerText = text;
     
   }
 
