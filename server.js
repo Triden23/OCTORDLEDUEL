@@ -1494,7 +1494,6 @@ const WORDS = [
   "zuzim", "zygal", "zygon", "zymes", "zymic", "Miniy"
 ];
 
-
 function pickN(n) {
   const copy = WORDS.slice();
   const out = [];
@@ -1601,6 +1600,15 @@ wss.on('connection', function (ws, req) {
       const data = JSON.parse(raw);
 
       if (data.type === 'guess') {
+
+        const alreadyGuessed = playerData.attemptsPerBoard.some(board =>
+          board.some(attempt => attempt.guess === guess)
+        );
+
+        if (alreadyGuessed) {
+          ws.send(JSON.stringify({ type: 'invalid', message: 'You already used that word!' }));
+          return;
+        }
         const guess = data.guess.trim().toLowerCase();
         if (!WORDS.includes(guess)) {
           ws.send(JSON.stringify({ type: 'invalid', message: 'Word not in word list!' }));
@@ -1638,15 +1646,15 @@ wss.on('connection', function (ws, req) {
           });
 
           s.ws.send(JSON.stringify({
-    type: 'update',
-    guesser: playerId,
-    guess,
-    feedbacks: filteredFeedbacks,
-    solvedCount: fromYou
-      ? targetData.solvedCount             // your own solved count
-      : playerData.solvedCount,           // opponent solved count
-    fromYou
-  }));
+            type: 'update',
+            guesser: playerId,
+            guess,
+            feedbacks: filteredFeedbacks,
+            solvedCount: fromYou
+              ? targetData.solvedCount             // your own solved count
+              : playerData.solvedCount,           // opponent solved count
+            fromYou
+          }));
         });
 
         // Check for finished game

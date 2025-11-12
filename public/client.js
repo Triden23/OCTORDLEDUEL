@@ -19,7 +19,17 @@
 
   Increase keyboard size - DONE
 
+  Fix msg spots - Not done
+
   Add brief popup to show word not in list like 1 seconds and focus that. - MAYBE
+
+  --
+  NEW BUGS
+  --
+
+  Refresh the page if the opponent disconnects
+  Dont allow a guess to be re-used(Prevents bug)
+
 
   ---------------------------------------------------------------------------------------
   Wordle
@@ -54,13 +64,13 @@
   function addMsg(m) {
     const p = document.createElement('div');
     p.innerText = m;
-    
+
     messages.appendChild(p);
     messages.scrollTop = messages.scrollHeight;
     p = document.createElement('div');
     p.innerText = m;
     messages2.appendChild(p);
-    messages2.scrollTop = messages.scrollHeight;
+    messages2.scrollTop = messages2.scrollHeight;
   }
 
   function makeBoards(n) {
@@ -202,13 +212,13 @@
         else if (data.type === 'invalid') {
           addMsg(data.message);
         }
-    
+
         else if (data.type === 'update') {
           const { guess, feedbacks, fromYou } = data;
           const boardState = fromYou ? yourState : oppState;
 
           feedbacks.forEach((fb, boardIndex) => {
-            if (!fb) return; 
+            if (!fb) return;
 
             const attempts = boardState.attemptsPerBoard[boardIndex].length;
 
@@ -232,7 +242,13 @@
         }
 
         else if (data.type === 'finish') { addMsg(data.message); }
-        else if (data.type === 'opponentLeft') { setStatus('Opponent disconnected'); addMsg('Opponent left'); }
+        else if (data.type === 'opponentLeft') {
+          setStatus('Opponent disconnected');
+          addMsg('Opponent left — refreshing...');
+          setTimeout(() => {
+            location.reload(); // refresh page after 2 seconds
+          }, 2000);
+        }
       } catch (e) { console.error(e); }
     };
   }
@@ -242,7 +258,7 @@
   guessBtn.onclick = sendGuess;
   guessInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendGuess(); });
   showOp.addEventListener('change', function () {
-    
+
     if (this.checked) {
       showsOp();
     } else {
@@ -268,16 +284,16 @@
   }
 
   function showsOp() {
-  opCol.style.display = 'block';  
-  youCol.style.margin = '';       
-  gameArea.classList.remove('centered');
-}
+    opCol.style.display = 'block';
+    youCol.style.margin = '';
+    gameArea.classList.remove('centered');
+  }
 
-function hidesOp() {
-  opCol.style.display = 'none';
-  youCol.style.margin = '0 auto';
-  gameArea.classList.add('centered');
-}
+  function hidesOp() {
+    opCol.style.display = 'none';
+    youCol.style.margin = '0 auto';
+    gameArea.classList.add('centered');
+  }
 
   const urlParams = new URLSearchParams(window.location.search);
   const r = urlParams.get('room');
@@ -335,17 +351,17 @@ function hidesOp() {
     const key = e.target.dataset.key;
 
     if (key === "Enter") {
-      guessBtn.click();      
+      guessBtn.click();
       guessInput.value = "";
       guessInput2.value = "";
     }
     else if (key === "Back") {
-      
+
       guessInput.value = guessInput.value.slice(0, -1);
       guessInput2.value = guessInput2.value.slice(0, -1);
     }
     else if (key.length === 1) {
-      
+
       if (guessInput.value.length < 5) {
         guessInput.value += key.toLowerCase();
       }
@@ -356,7 +372,7 @@ function hidesOp() {
   }
 
 
-  
+
   window.updateKeyboardColors = function (guess, feedback, boardIndex) {
     for (let i = 0; i < 5; i++) {
       const letter = guess[i];
