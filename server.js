@@ -1491,8 +1491,9 @@ const WORDS = [
   "zombi", "zonae", "zonal", "zonda", "zoned", "zoner", "zones", "zonks", "zooea", "zooey",
   "zooid", "zooks", "zooms", "zoomy", "zoons", "zooty", "zoppa", "zoppo", "zoril", "zoris",
   "zorro", "zorse", "zouks", "zowee", "zowie", "zulus", "zupan", "zupas", "zuppa", "zurfs",
-  "zuzim", "zygal", "zygon", "zymes", "zymic"
+  "zuzim", "zygal", "zygon", "zymes", "zymic", "Miniy"
 ];
+
 
 function pickN(n) {
   const copy = WORDS.slice();
@@ -1595,10 +1596,10 @@ wss.on('connection', function (ws, req) {
   } else {
     ws.send(JSON.stringify({ type: 'wait', message: 'Waiting for opponent...' }));
   }
-
   ws.on('message', function (raw) {
     try {
       const data = JSON.parse(raw);
+
       if (data.type === 'guess') {
         const guess = data.guess.trim().toLowerCase();
         if (!WORDS.includes(guess)) {
@@ -1608,7 +1609,7 @@ wss.on('connection', function (ws, req) {
 
         const playerData = room.playersData[playerId];
 
-        // Keep track of boards solved BEFORE this guess
+        // Remember solved state BEFORE this guess
         const solvedBefore = [...playerData.solved];
 
         // Compute feedback for all boards
@@ -1616,18 +1617,12 @@ wss.on('connection', function (ws, req) {
           const fb = getFeedback(guess, answer);
           playerData.attemptsPerBoard[i].push({ guess, feedback: fb });
 
-          // If this guess solved the board, mark it for this player AND opponent
+          // Mark as solved for this player if correct
           if (fb.every(c => c === 'g') && !playerData.solved[i]) {
             playerData.solved[i] = true;
             playerData.solvedCount++;
-
-            // Update opponent solved state
-            room.sockets.forEach(s => {
-              if (s.playerId !== playerId) {
-                room.playersData[s.playerId].solved[i] = true;
-              }
-            });
           }
+
           return fb;
         });
 
@@ -1637,19 +1632,21 @@ wss.on('connection', function (ws, req) {
           const targetData = room.playersData[s.playerId];
 
           const filteredFeedbacks = feedbacks.map((fb, idx) => {
-            // Send feedback if this board was NOT solved before this guess
-            if (!solvedBefore[idx]) return fb;
-            return null; // skip future updates for already solved boards
+            // Send feedback if this board was NOT solved BEFORE this guess
+            if (!fb) return null;
+            return solvedBefore[idx] ? null : fb; // Use solvedBefore instead of current solved state
           });
 
           s.ws.send(JSON.stringify({
-            type: 'update',
-            guesser: playerId,
-            guess,
-            feedbacks: filteredFeedbacks,
-            solvedCount: targetData.solvedCount,
-            fromYou
-          }));
+    type: 'update',
+    guesser: playerId,
+    guess,
+    feedbacks: filteredFeedbacks,
+    solvedCount: fromYou
+      ? targetData.solvedCount             // your own solved count
+      : playerData.solvedCount,           // opponent solved count
+    fromYou
+  }));
         });
 
         // Check for finished game
@@ -1658,17 +1655,94 @@ wss.on('connection', function (ws, req) {
             s.ws.send(JSON.stringify({
               type: 'finish',
               winner: playerId,
-              message: playerId === s.playerId ? 'You finished all words! You win!' : 'Opponent finished all words.'
+              message: playerId === s.playerId
+                ? 'You finished all words! You win!'
+                : 'Opponent finished all words.'
             }));
           });
         }
       }
 
-
     } catch (e) {
       console.error('Error parsing message', e);
     }
-  });
+  }
+
+    /*ws.on('message', function (raw) {
+      try {
+        const data = JSON.parse(raw);
+        if (data.type === 'guess') {
+          const guess = data.guess.trim().toLowerCase();
+          if (!WORDS.includes(guess)) {
+            ws.send(JSON.stringify({ type: 'invalid', message: 'Word not in word list!' }));
+            return;
+          }
+  
+          const playerData = room.playersData[playerId];
+  
+          // Keep track of boards solved BEFORE this guess
+          const solvedBefore = [...playerData.solved];
+  
+          // Compute feedback for all boards
+          const feedbacks = room.answers.map((answer, i) => {
+            const fb = getFeedback(guess, answer);
+            playerData.attemptsPerBoard[i].push({ guess, feedback: fb });
+  
+            // If this guess solved the board, mark it for this player AND opponent
+            if (fb.every(c => c === 'g') && !playerData.solved[i]) {
+              playerData.solved[i] = true;
+              playerData.solvedCount++;
+  
+              // Update opponent solved state
+              room.sockets.forEach(s => {
+                if (s.playerId !== playerId) {
+                  room.playersData[s.playerId].solved[i] = true;
+                }
+              });
+            }
+            return fb;
+          });
+  
+          // Send updates to each player
+          room.sockets.forEach(s => {
+            const fromYou = (s.playerId === playerId);
+            const targetData = room.playersData[s.playerId];
+  
+            const filteredFeedbacks = feedbacks.map((fb, idx) => {
+              // Send feedback if this board was NOT solved before this guess
+              if (!solvedBefore[idx]) return fb;
+              return null; // skip future updates for already solved boards
+            });
+  
+            s.ws.send(JSON.stringify({
+              type: 'update',
+              guesser: playerId,
+              guess,
+              feedbacks: filteredFeedbacks,
+              solvedCount: targetData.solvedCount,
+              fromYou
+            }));
+          });
+  
+          // Check for finished game
+          if (playerData.solvedCount === room.answers.length) {
+            room.sockets.forEach(s => {
+              s.ws.send(JSON.stringify({
+                type: 'finish',
+                winner: playerId,
+                message: playerId === s.playerId ? 'You finished all words! You win!' : 'Opponent finished all words.'
+              }));
+            });
+          }
+        }
+  
+  
+      } catch (e) {
+        console.error('Error parsing message', e);
+      }
+    }*/
+
+  );
 
   ws.on('close', () => {
     if (!room) return;

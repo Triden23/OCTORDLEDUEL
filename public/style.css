@@ -5,7 +5,8 @@
   --muted:#9aa7b2;
   --green:#16a34a;
   --yellow:#f59e0b;
-  --gray:#374151;
+  --gray:#374151; 
+  --spacer:#202c46;
   --tile-size:36px;
 }
 *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
@@ -13,7 +14,23 @@ body{margin:0;background:linear-gradient(180deg,#071024,#0b1220);color:#e6eef6;m
 .container{max-width:1100px;margin:0 auto;}
 h1{margin:6px 0 12px;font-size:20px;}
 .column{display:inline-block;vertical-align:top;width:48%;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;margin:6px;}
-.boards{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.boards {
+  display: flex;
+  flex-direction: column; /* stack pairs vertically */
+  gap: 0; /* spacing handled by spacer div */
+}
+
+.board-pair {
+  display: flex;
+  gap: 8px; /* space between two boards in a pair */
+  justify-content: center;
+}
+
+.board-spacer {
+  height: calc(var(--tile-size) / 2); /* half tile height */
+  background-color: var(--spacer);
+  width: 100%;
+}
 .board{
   background:rgba(255,255,255,0.01);
   padding:6px;border-radius:6px; min-height:160px;
@@ -36,11 +53,45 @@ h1{margin:6px 0 12px;font-size:20px;}
 #controls button{margin-left:8px;padding:6px 10px;border-radius:6px;border:none;background:#1e3a8a;color:#fff}
 #status{margin-top:8px;color:var(--muted)}
 #inputArea{margin-top:12px}
+#gameArea {
+  display: flex;
+  justify-content: space-between; /* default: two columns */
+  gap: 10px;
+}
+.hidden { display: none; }
+#gameArea.centered {
+  justify-content: center; /* when opponent hidden */
+}
+
+.column {
+  flex: 0 0 48%; /* default width for 2 columns */
+  transition: all 0.3s ease;
+}
+
+
+#youColumn.centered {
+  flex: 0 0 auto; /* shrink to content when opponent hidden */
+}
+#youColumn.h2 {
+  display: flex;
+  justify-content: space-between; /* left: title, right: guesses */
+  align-items: center;
+  margin: 0 0 8px 0;
+  font-size: 1.2em;
+}
+#opColumn.h2 {
+  display: flex;
+  justify-content: space-between; /* left: title, right: guesses */
+  align-items: center;
+  margin: 0 0 8px 0;
+  font-size: 1.2em;
+}
 #messages{margin-top:8px;color:var(--muted)}
 .hidden{display:none}
 #footer{margin-top:18px;color:var(--muted)}
 .keyboard {
   display: grid;
+  transform:scale(1.25);
   grid-template-rows: repeat(3, auto);
   gap: 6px;
   justify-content: center;
@@ -74,9 +125,11 @@ h1{margin:6px 0 12px;font-size:20px;}
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, auto);
   pointer-events: none;
   border-radius: 4px;
+  opacity: 0.5;
   z-index: -1; /* <<< puts slices behind the text */
 }
 
