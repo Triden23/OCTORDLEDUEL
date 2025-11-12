@@ -40,6 +40,7 @@
   const guessBtn = document.getElementById('guessBtn');
   const guessBtn2 = document.getElementById('guessBtn2');
   const messages = document.getElementById('messages');
+  const messages2 = document.getElementById('messages2');
   const youScore = document.getElementById('youScore');
   const opScore = document.getElementById('opScore');
   const youGuess = document.getElementById('youGuess');
@@ -55,8 +56,11 @@
   function addMsg(m) {
     const p = document.createElement('div');
     p.innerText = m;
+    
     messages.appendChild(p);
     messages.scrollTop = messages.scrollHeight;
+    messages2.appendChild(p);
+    messages2.scrollTop = messages.scrollHeight;
   }
 
   /*function makeBoards(n) {
