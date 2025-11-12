@@ -45,7 +45,7 @@
   ---------------------------------------------------------------------------------------
   Floating keyboard
   react.js - Look into
-  
+
 
 */
   //<select id="boardSelect"></select>
@@ -73,13 +73,15 @@
   let yourState, oppState;
 
   function setStatus(s) { statusEl.innerText = s; }
+
+  //  Send msg to the top and the bottom of the screen for user to see.
   function addMsg(m) {
     const p1 = document.createElement('div');
     p1.innerText = m;
     p1.style.color = 'var(--muted)'; // force color
     messages.appendChild(p1);
 
-    // Keep only the last 5 messages
+    // Limit the number of messages seen in each area
     while (messages.children.length > 3) {
       messages.removeChild(messages.firstChild);
     }
@@ -87,16 +89,17 @@
 
     const p2 = document.createElement('div');
     p2.innerText = m;
-    p2.style.color = 'var(--muted)'; // force color
+    p2.style.color = 'var(--muted)'; //For some reason I have to force this color despite css being this color already.
     messages2.appendChild(p2);
 
-    // Keep only the last 5 messages
+    // Limit number of messages again
     while (messages2.children.length > 3) {
       messages2.removeChild(messages2.firstChild);
     }
     messages2.scrollTop = messages2.scrollHeight;
   }
 
+  //  Creates boards for the game
   function makeBoards(n) {
     yourBoardsEl.innerHTML = '';
     oppBoardsEl.innerHTML = '';
@@ -176,11 +179,13 @@
     }
   }
 
+  //  Update score count for you and your opponent
   function updateScores() {
     youScore.innerText = `${yourState.solvedCount}/${boardCount}`;
     opScore.innerText = `${oppState.solvedCount}/${boardCount}`;
   }
 
+  //  Update the guess count for you and your opponent
   function updateGuesses() {
     const youDisplay = Math.min(youCurrentGuess, maxGuesses);
     const opDisplay = Math.min(opCurrentGuess, maxGuesses);
@@ -189,6 +194,7 @@
     opGuess.innerText = `${opDisplay}/${maxGuesses}`;
   }
 
+  //  Applies feedback from the guess in grey yellow green format
   function applyFeedback(board, attemptIndex, guess, feedback, fromYou) {
     const bd = document.getElementById(fromYou ? `your-board-${board}` : `opp-board-${board}`);
     if (!bd) return;
@@ -210,8 +216,8 @@
       }
     }
   }
-  //Tests
 
+  //  Connects to the room made by the server
   function connect(room) {
     const loc = window.location;
     const wsUrl = `ws://${loc.hostname}:8080/?room=${encodeURIComponent(room)}`;
@@ -221,11 +227,13 @@
     ws.onmessage = (ev) => {
       try {
         const data = JSON.parse(ev.data);
+        //  Join state
         if (data.type === 'joined') {
           playerId = data.playerId; boardCount = data.boardCount || boardCount; maxGuesses = data.maxGuesses || maxGuesses;
           makeBoards(boardCount);
           setStatus(`Joined as ${playerId}. Waiting for opponent...`);
         } else if (data.type === 'wait') { setStatus(data.message); }
+        // Start state
         else if (data.type === 'start') {
           setStatus(data.message);
           gameArea.classList.remove('hidden');
@@ -238,7 +246,7 @@
         else if (data.type === 'invalid') {
           addMsg(data.message);
         }
-
+        // Update state
         else if (data.type === 'update') {
           const { guess, feedbacks, fromYou } = data;
           const boardState = fromYou ? yourState : oppState;
@@ -276,13 +284,14 @@
       } catch (e) { console.error(e); }
     };
 
+    //  Connection cleanup
     ws.onclose = (event) => {
       console.log("Connection closed:", event);
       setStatus("Disconnected from server");
       addMsg("Lost connection to server — refreshing...");
       setTimeout(() => window.location.reload(), 1500);
     };
-
+    //  Error cleanup
     ws.onerror = (error) => {
       console.error("WebSocket error:", error);
       setStatus("Connection error");
@@ -291,8 +300,8 @@
     };
   }
 
+  // Button I/O
   joinBtn.onclick = () => { const r = roomInput.value.trim() || 'default'; connect(r); };
-
   guessBtn.onclick = sendGuess;
   guessInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendGuess(); });
   showOp.addEventListener('change', function () {
@@ -329,6 +338,7 @@
 
   }
 
+  //  Functionality for the show/hide opponent
   function showsOp() {
     opCol.style.display = 'block';
     youCol.style.margin = '';
@@ -348,6 +358,7 @@
 })();
 
 (() => {
+  //  keyboard at the bottom
   const keyboardLayout = [
     "q w e r t y u i o p".split(" "),
     "a s d f g h j k l".split(" "),
@@ -362,7 +373,7 @@
 
   const boardCount = 8;
   const keyStates = {};
-
+  //  Create the keyboard
   function createKeyboard() {
     keyboardLayout.forEach(row => {
       const rowDiv = document.createElement("div");
@@ -392,7 +403,7 @@
       keyboardContainer.appendChild(rowDiv);
     });
   }
-
+  // Event handling
   function onKeyClick(e) {
     const key = e.target.dataset.key;
 
@@ -418,7 +429,7 @@
   }
 
 
-
+  //  Update the keys on guess
   window.updateKeyboardColors = function (guess, feedback, boardIndex) {
     for (let i = 0; i < 5; i++) {
       const letter = guess[i];
