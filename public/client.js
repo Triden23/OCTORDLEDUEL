@@ -27,9 +27,10 @@
   NEW BUGS
   --
 
-  Refresh the page if the opponent disconnects
-  Dont allow a guess to be re-used(Prevents bug)
+  Refresh the page if the opponent disconnects - DONE
+  Dont allow a guess to be re-used(Prevents bug) - DONE
 
+  Check to see if server connection has been interrupted and then refesh as well - WIP
 
   ---------------------------------------------------------------------------------------
   Wordle
@@ -62,16 +63,16 @@
 
   function setStatus(s) { statusEl.innerText = s; }
   function addMsg(m) {
-    const p = document.createElement('div');
-    p.innerText = m;
+  const p1 = document.createElement('div');
+  p1.innerText = m;
+  messages.appendChild(p1);
+  messages.scrollTop = messages.scrollHeight;
 
-    messages.appendChild(p);
-    messages.scrollTop = messages.scrollHeight;
-    p = document.createElement('div');
-    p.innerText = m;
-    messages2.appendChild(p);
-    messages2.scrollTop = messages2.scrollHeight;
-  }
+  const p2 = document.createElement('div');
+  p2.innerText = m;
+  messages2.appendChild(p2);
+  messages2.scrollTop = messages2.scrollHeight;
+}
 
   function makeBoards(n) {
     yourBoardsEl.innerHTML = '';
@@ -245,9 +246,7 @@
         else if (data.type === 'opponentLeft') {
           setStatus('Opponent disconnected');
           addMsg('Opponent left — refreshing...');
-          setTimeout(() => {
-            location.reload(); // refresh page after 2 seconds
-          }, 2000);
+          window.location.reload
         }
       } catch (e) { console.error(e); }
     };
