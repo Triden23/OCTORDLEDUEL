@@ -32,6 +32,13 @@
 
   Check to see if server connection has been interrupted and then refesh as well - DONE
 
+  NEW NEW BUGS
+  --
+
+  Guess count can keep going - DONE
+  Top keyboard bug - DONE - MAYBE DONE
+  Limit messages to 5 - WIP
+
   ---------------------------------------------------------------------------------------
   Wordle
 
@@ -66,13 +73,23 @@
     const p1 = document.createElement('div');
     p1.innerText = m;
     messages.appendChild(p1);
+
+    // Keep only the last 5 messages
+    while (messages.children.length > 3) {
+        messages.removeChild(messages.firstChild);
+    }
     messages.scrollTop = messages.scrollHeight;
 
     const p2 = document.createElement('div');
     p2.innerText = m;
     messages2.appendChild(p2);
+
+    // Keep only the last 5 messages
+    while (messages2.children.length > 3) {
+        messages2.removeChild(messages2.firstChild);
+    }
     messages2.scrollTop = messages2.scrollHeight;
-  }
+}
 
   function makeBoards(n) {
     yourBoardsEl.innerHTML = '';
