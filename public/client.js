@@ -30,7 +30,7 @@
   Refresh the page if the opponent disconnects - DONE
   Dont allow a guess to be re-used(Prevents bug) - DONE
 
-  Check to see if server connection has been interrupted and then refesh as well - WIP
+  Check to see if server connection has been interrupted and then refesh as well - DONE
 
   ---------------------------------------------------------------------------------------
   Wordle
@@ -254,19 +254,19 @@
     };
 
     ws.onclose = (event) => {
-    console.log("Connection closed:", event);
-    setStatus("Disconnected from server");
-    addMsg("Lost connection to server — refreshing...");
-    // Optional: reload after a short delay
-    setTimeout(() => window.location.reload(), 1500);
-};
+      console.log("Connection closed:", event);
+      setStatus("Disconnected from server");
+      addMsg("Lost connection to server — refreshing...");
+      // Optional: reload after a short delay
+      setTimeout(() => window.location.reload(), 1500);
+    };
 
-ws.onerror = (error) => {
-    console.error("WebSocket error:", error);
-    setStatus("Connection error");
-    addMsg("WebSocket encountered an error.");
-    setTimeout(() => window.location.reload(), 1500);
-};
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      setStatus("Connection error");
+      addMsg("WebSocket encountered an error.");
+      setTimeout(() => window.location.reload(), 1500);
+    };
   }
 
   joinBtn.onclick = () => { const r = roomInput.value.trim() || 'default'; connect(r); };
@@ -286,17 +286,25 @@ ws.onerror = (error) => {
   guessInput2.addEventListener('keydown', e => { if (e.key === 'Enter') sendGuess2(); });
 
   function sendGuess() {
-    const guess = (guessInput.value || '').trim().toLowerCase();
-    if (!guess || guess.length !== 5) { addMsg('Guess must be 5 letters'); return; }
-    ws.send(JSON.stringify({ type: 'guess', guess }));
-    guessInput.value = '';
+    if (youCurrentGuess < maxGuesses) {
+      const guess = (guessInput.value || '').trim().toLowerCase();
+      if (!guess || guess.length !== 5) { addMsg('Guess must be 5 letters'); return; }
+      ws.send(JSON.stringify({ type: 'guess', guess }));
+      guessInput.value = '';
+      guessInput2.value = '';
+    }
+
   }
 
   function sendGuess2() {
-    const guess = (guessInput2.value || '').trim().toLowerCase();
-    if (!guess || guess.length !== 5) { addMsg('Guess must be 5 letters'); return; }
-    ws.send(JSON.stringify({ type: 'guess', guess }));
-    guessInput2.value = '';
+    if (youCurrentGuess < maxGuesses) {
+      const guess = (guessInput2.value || '').trim().toLowerCase();
+      if (!guess || guess.length !== 5) { addMsg('Guess must be 5 letters'); return; }
+      ws.send(JSON.stringify({ type: 'guess', guess }));
+      guessInput.value = '';
+      guessInput2.value = '';
+    }
+
   }
 
   function showsOp() {
