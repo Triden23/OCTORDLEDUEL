@@ -3,6 +3,9 @@
 A multiplayer Wordle-style game supporting 1v1 play on multiple boards simultaneously. Players compete to solve all boards first.
 
 ---
+Temporary hosting for a few days
+[http://ec2-3-142-68-150.us-east-2.compute.amazonaws.com:8080](http://ec2-3-142-68-150.us-east-2.compute.amazonaws.com:8080)
+---
 
 ## Features
 
