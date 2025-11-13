@@ -96,7 +96,7 @@ h1{margin:6px 0 12px;font-size:20px;}
 #footer{margin-top:18px;color:var(--muted)}
 .keyboard {
   position: fixed;
-  bottom: 15px;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%) scale(1.25);
   display: grid;
