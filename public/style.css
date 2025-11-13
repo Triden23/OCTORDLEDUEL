@@ -128,8 +128,8 @@ h1{margin:6px 0 12px;font-size:20px;}
   background-color: #d3d6da;
   border: none;
   border-radius: 4px;
-  width: 50px;           /* fixed width for uniformity */
-  height: 50px;          /* fixed height for uniformity */
+  width: 30px;           /* fixed width for uniformity */
+  height: 30px;          /* fixed height for uniformity */
   font-weight: bold;
   text-transform: uppercase;
   cursor: pointer;
