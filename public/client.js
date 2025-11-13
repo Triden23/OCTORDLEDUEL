@@ -43,10 +43,9 @@
   Amount of Kila fixes = 16
   Amount of fixes = 2
   ---------------------------------------------------------------------------------------
-  Floating keyboard
-  react.js - Look into
-
-
+  Floating keyboard - done
+  react.js - Look into - cant be bothered
+  ---------------------------------------------------------------------------------------
 */
   //<select id="boardSelect"></select>
   const statusEl = document.getElementById('status');
