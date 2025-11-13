@@ -57,6 +57,7 @@
   const oppBoardsEl = document.getElementById('oppBoards');
   const guessInput = document.getElementById('guessInput');
   const guessInput2 = document.getElementById('guessInput2');
+  const guessInput3 = document.getElementById("guessInput3");
   const guessBtn = document.getElementById('guessBtn');
   const guessBtn2 = document.getElementById('guessBtn2');
   const messages = document.getElementById('messages');
@@ -323,6 +324,7 @@
       ws.send(JSON.stringify({ type: 'guess', guess }));
       guessInput.value = '';
       guessInput2.value = '';
+      guessInput3.value = '';
     }
 
   }
@@ -368,6 +370,7 @@
   const keyboardContainer = document.getElementById("keyboard");
   const guessInput = document.getElementById("guessInput");
   const guessInput2 = document.getElementById("guessInput2");
+  const guessInput3 = document.getElementById("guessInput3");
   const guessBtn = document.getElementById("guessBtn");
   const guessBtn2 = document.getElementById("guessBtn2");
 
@@ -411,6 +414,7 @@
       guessBtn.click();
       guessInput.value = "";
       guessInput2.value = "";
+      guessInput3.value = "";
     }
     else if (key === "Back") {
 
@@ -424,6 +428,9 @@
       }
       if (guessInput2.value.length < 5) {
         guessInput2.value += key.toLowerCase();
+      }
+      if (guessInput3.value.length < 5) {
+        guessInput3.value += key.toLowerCase();
       }
     }
   }
