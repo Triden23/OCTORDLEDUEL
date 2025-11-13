@@ -333,64 +333,16 @@
     });
   });
 
-  // Unified sendGuess function
   function sendGuess() {
     if (youCurrentGuess >= maxGuesses) return;
-
-    const guess = guessInput.value.trim().toLowerCase(); // any input is fine since they mirror
+    const guess = guessInput.value.trim().toLowerCase();
     if (!guess || guess.length !== 5) {
       addMsg('Guess must be 5 letters');
       return;
     }
-
     ws.send(JSON.stringify({ type: 'guess', guess }));
-
-    // Clear all inputs
     guessInputs.forEach(i => i.value = '');
   }
-
-
-
-  /*
-  guessInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendGuess(); });
-  
-  
-  guessInput2.addEventListener('keydown', e => { if (e.key === 'Enter') sendGuess2(); });
-
-  function sendGuess() {
-    if (youCurrentGuess < maxGuesses) {
-      const guess = (guessInput.value || '').trim().toLowerCase();
-      if (!guess || guess.length !== 5) { addMsg('Guess must be 5 letters'); return; }
-      ws.send(JSON.stringify({ type: 'guess', guess }));
-      guessInput.value = '';
-      guessInput2.value = '';
-      guessInput3.value = '';
-    }
-
-  }
-
-  function sendGuess2() {
-    if (youCurrentGuess < maxGuesses) {
-      const guess = (guessInput2.value || '').trim().toLowerCase();
-      if (!guess || guess.length !== 5) { addMsg('Guess must be 5 letters'); return; }
-      ws.send(JSON.stringify({ type: 'guess', guess }));
-      guessInput.value = '';
-      guessInput2.value = '';
-      guessInput3.value = '';
-    }
-
-  }
-
-  function sendGuess3(){
-    if (youCurrentGuess < maxGuesses) {
-      const guess = (guessInput3.value || '').trim().toLowerCase();
-      if (!guess || guess.length !== 5) { addMsg('Guess must be 5 letters'); return; }
-      ws.send(JSON.stringify({ type: 'guess', guess }));
-      guessInput.value = '';
-      guessInput2.value = '';
-      guessInput3.value = '';
-    }
-  }*/
 
   //  Functionality for the show/hide opponent
   function showsOp() {
