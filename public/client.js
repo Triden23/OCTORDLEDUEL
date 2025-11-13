@@ -240,7 +240,7 @@
           gameArea.classList.remove('hidden');
           document.getElementById('inputArea').classList.remove('hidden');
           document.getElementById('keyboard').classList.remove('hidden');
-          document.getElementById('inputArea2').classList.remove('hidden');
+          //document.getElementById('inputArea2').classList.remove('hidden');
           document.getElementById('playArea').classList.remove('hidden');
           addMsg('Game started!');
         }
