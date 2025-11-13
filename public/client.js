@@ -56,7 +56,6 @@
   const yourBoardsEl = document.getElementById('yourBoards');
   const oppBoardsEl = document.getElementById('oppBoards');
   const guessInput = document.getElementById('guessInput');
-  const guessInput2 = document.getElementById('guessInput2');
   const guessInput3 = document.getElementById("guessInput3");
   const guessBtn = document.getElementById('guessBtn');
   const guessBtn2 = document.getElementById('guessBtn2');
@@ -193,6 +192,9 @@
 
     youGuess.innerText = `${youDisplay}/${maxGuesses}`;
     opGuess.innerText = `${opDisplay}/${maxGuesses}`;
+    if(youGuess.innerText == `${maxGuesses}/${maxGuesses}`){
+      addMsg("Out of guesses");
+    }
   }
 
   //  Applies feedback from the guess in grey yellow green format
@@ -240,7 +242,6 @@
           gameArea.classList.remove('hidden');
           document.getElementById('inputArea').classList.remove('hidden');
           document.getElementById('keyboard').classList.remove('hidden');
-          document.getElementById('inputArea2').classList.remove('hidden');
           document.getElementById('playArea').classList.remove('hidden');
           addMsg('Game started!');
         }
@@ -316,7 +317,7 @@
     }
   });
 
-  const guessInputs = [guessInput, guessInput2, guessInput3];
+  const guessInputs = [guessInput, guessInput3];
 
 
   guessInputs.forEach(input => {
@@ -373,7 +374,6 @@
 
   const keyboardContainer = document.getElementById("keyboard");
   const guessInput = document.getElementById("guessInput");
-  const guessInput2 = document.getElementById("guessInput2");
   const guessInput3 = document.getElementById("guessInput3");
   const guessBtn = document.getElementById("guessBtn");
   const guessBtn2 = document.getElementById("guessBtn2");
@@ -419,21 +419,16 @@
     if (key === "Enter") {
       guessBtn.click();
       guessInput.value = "";
-      guessInput2.value = "";
       guessInput3.value = "";
     }
     else if (key === "Back") {
       guessInput.value = guessInput.value.slice(0, -1);
-      guessInput2.value = guessInput2.value.slice(0, -1);
       guessInput3.value = guessInput3.value.slice(0, -1);
     }
     else if (key.length === 1) {
 
       if (guessInput.value.length < 5) {
         guessInput.value += key.toLowerCase();
-      }
-      if (guessInput2.value.length < 5) {
-        guessInput2.value += key.toLowerCase();
       }
       if (guessInput3.value.length < 5) {
         guessInput3.value += key.toLowerCase();
