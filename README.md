@@ -89,7 +89,7 @@ A multiplayer Wordle-style game supporting 1v1 play on multiple boards simultane
 
 ## Credits
 
-* **Kilamonky** – Editor / Bugfinder
+* **Kilamonky** – Editor / Bug bloodhound
 
 ---
 
