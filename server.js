@@ -1,5 +1,3 @@
-// server.js
-
 const express = require('express');
 const { createServer } = require('http');
 const WebSocket = require('ws');
@@ -1794,7 +1792,7 @@ function assignPlayerId(room) {
 
 wss.on('connection', function (ws, req) {
   const url = req.url || '';
-  let host = (req.headers.host || 'localhost').split(':')[0]; // strip port if present
+  let host = (req.headers.host || 'localhost').split(':')[0];
   const fullUrl = `http://${host}${url}`;
   const q = new URL(fullUrl).searchParams;
   const roomId = q.get('room') || 'default';
@@ -1835,10 +1833,9 @@ wss.on('connection', function (ws, req) {
     try {
       const data = JSON.parse(raw);
       if (data.type === 'guess') {
-        const guess = data.guess.trim().toLowerCase(); // ✅ move this up first
-        const playerData = room.playersData[playerId]; // ✅ define before using it
+        const guess = data.guess.trim().toLowerCase();
+        const playerData = room.playersData[playerId];
 
-        // ✅ Prevent reusing the same guess
         const alreadyGuessed = playerData.attemptsPerBoard.some(board =>
           board.some(attempt => attempt.guess === guess)
         );
@@ -1847,21 +1844,17 @@ wss.on('connection', function (ws, req) {
           return;
         }
 
-        // ✅ Check if the word is valid
         if (!WORDS.includes(guess)) {
           ws.send(JSON.stringify({ type: 'invalid', message: 'Word not in word list!' }));
           return;
         }
 
-        // ✅ Remember solved state BEFORE this guess
         const solvedBefore = [...playerData.solved];
 
-        // ✅ Compute feedback for all boards
         const feedbacks = room.answers.map((answer, i) => {
           const fb = getFeedback(guess, answer);
           playerData.attemptsPerBoard[i].push({ guess, feedback: fb });
 
-          // Mark as solved for this player if correct
           if (fb.every(c => c === 'g') && !playerData.solved[i]) {
             playerData.solved[i] = true;
             playerData.solvedCount++;
@@ -1870,13 +1863,11 @@ wss.on('connection', function (ws, req) {
           return fb;
         });
 
-        // ✅ Send updates to each player
         room.sockets.forEach(s => {
           const fromYou = (s.playerId === playerId);
           const targetData = room.playersData[s.playerId];
 
           const filteredFeedbacks = feedbacks.map((fb, idx) => {
-            // Send feedback if this board was NOT solved BEFORE this guess
             if (!fb) return null;
             return solvedBefore[idx] ? null : fb;
           });
@@ -1887,13 +1878,13 @@ wss.on('connection', function (ws, req) {
             guess,
             feedbacks: filteredFeedbacks,
             solvedCount: fromYou
-              ? targetData.solvedCount      // your own solved count
-              : playerData.solvedCount,     // opponent solved count
+              ? targetData.solvedCount      
+              : playerData.solvedCount,     
             fromYou
           }));
         });
 
-        // ✅ Check for finished game
+
         if (playerData.solvedCount === room.answers.length) {
           room.sockets.forEach(s => {
             s.ws.send(JSON.stringify({
