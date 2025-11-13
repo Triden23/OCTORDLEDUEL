@@ -456,6 +456,7 @@
         if (state === "g") color = "var(--green)";
         else if (state === "y") color = "var(--yellow)";
         else if (state === "b") color = "var(--gray)";
+        else if (state === null) color = "var(--green)";
         s.style.background = color;
       });
     }
