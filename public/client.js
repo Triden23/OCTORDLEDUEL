@@ -193,7 +193,7 @@
     youGuess.innerText = `${youDisplay}/${maxGuesses}`;
     opGuess.innerText = `${opDisplay}/${maxGuesses}`;
     if(youGuess.innerText == `${maxGuesses}/${maxGuesses}`){
-      send()
+      addMsg("Out of Guesses");
     }
   }
 
