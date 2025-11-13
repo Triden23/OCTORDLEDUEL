@@ -440,6 +440,7 @@
         btn.textContent = key;
         btn.dataset.key = key;
 
+        // Only add slices for letter keys
         if (key.length === 1 && /[a-z]/.test(key)) {
           const slices = document.createElement("div");
           slices.classList.add("key-slices");
@@ -451,6 +452,7 @@
           }
           btn.appendChild(slices);
         }
+
         btn.onclick = onKeyClick;
         rowDiv.appendChild(btn);
       });
