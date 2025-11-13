@@ -193,6 +193,8 @@
 
     youGuess.innerText = `${youDisplay}/${maxGuesses}`;
     opGuess.innerText = `${opDisplay}/${maxGuesses}`;
+
+    if(youCurrentGuess >= maxGuesses) addMsg("Out of guesses");
   }
 
   //  Applies feedback from the guess in grey yellow green format
