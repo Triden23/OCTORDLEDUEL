@@ -417,7 +417,6 @@
       guessInput3.value = "";
     }
     else if (key === "Back") {
-
       guessInput.value = guessInput.value.slice(0, -1);
       guessInput2.value = guessInput2.value.slice(0, -1);
       guessInput3.value = guessInput3.value.slice(0, -1);
