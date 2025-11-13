@@ -302,9 +302,11 @@
   }
 
   // Button I/O
+
+
   joinBtn.onclick = () => { const r = roomInput.value.trim() || 'default'; connect(r); };
   guessBtn.onclick = sendGuess;
-  guessInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendGuess(); });
+  guessBtn2.onclick = sendGuess;
   showOp.addEventListener('change', function () {
 
     if (this.checked) {
@@ -314,7 +316,45 @@
     }
   });
 
-  guessBtn2.onclick = sendGuess2;
+  const guessInputs = [guessInput, guessInput2, guessInput3];
+
+
+  guessInputs.forEach(input => {
+    input.addEventListener('input', () => {
+      const value = input.value.slice(0, 5);
+      guessInputs.forEach(i => {
+        if (i !== input) i.value = value;
+      });
+    });
+
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') sendGuess();
+    });
+  });
+
+  // Unified sendGuess function
+  function sendGuess() {
+    if (youCurrentGuess >= maxGuesses) return;
+
+    const guess = guessInput.value.trim().toLowerCase(); // any input is fine since they mirror
+    if (!guess || guess.length !== 5) {
+      addMsg('Guess must be 5 letters');
+      return;
+    }
+
+    ws.send(JSON.stringify({ type: 'guess', guess }));
+
+    // Clear all inputs
+    guessInputs.forEach(i => i.value = '');
+  }
+
+
+
+  /*
+  guessInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendGuess(); });
+  
+  
   guessInput2.addEventListener('keydown', e => { if (e.key === 'Enter') sendGuess2(); });
 
   function sendGuess() {
@@ -336,9 +376,21 @@
       ws.send(JSON.stringify({ type: 'guess', guess }));
       guessInput.value = '';
       guessInput2.value = '';
+      guessInput3.value = '';
     }
 
   }
+
+  function sendGuess3(){
+    if (youCurrentGuess < maxGuesses) {
+      const guess = (guessInput3.value || '').trim().toLowerCase();
+      if (!guess || guess.length !== 5) { addMsg('Guess must be 5 letters'); return; }
+      ws.send(JSON.stringify({ type: 'guess', guess }));
+      guessInput.value = '';
+      guessInput2.value = '';
+      guessInput3.value = '';
+    }
+  }*/
 
   //  Functionality for the show/hide opponent
   function showsOp() {
