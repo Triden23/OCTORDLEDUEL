@@ -193,7 +193,7 @@
     youGuess.innerText = `${youDisplay}/${maxGuesses}`;
     opGuess.innerText = `${opDisplay}/${maxGuesses}`;
 
-    if(youCurrentGuess >= maxGuesses) addMsg("Out of guesses");
+    if (youCurrentGuess >= maxGuesses) addMsg("Out of guesses");
   }
 
   //  Applies feedback from the guess in grey yellow green format
@@ -220,9 +220,7 @@
   }
 
   //  Connects to the room made by the server
-  function connect(room) {
-    const loc = window.location;
-    const wsUrl = `ws://${loc.hostname}:8080/?room=${encodeURIComponent(room)}`;
+  function connect(wsUrl) {
     ws = new WebSocket(wsUrl);
     setStatus('Connecting...');
     ws.onopen = () => setStatus('Connected');
@@ -305,7 +303,18 @@
   // Button I/O
 
 
-  joinBtn.onclick = () => { const r = roomInput.value.trim() || 'default'; connect(r); };
+  //joinBtn.onclick = () => { const r = roomInput.value.trim() || 'default'; connect(r); };
+  joinBtn.onclick = () => {
+    const r = roomInput.value.trim() || "default";
+    const puzzles = puzzlesInput.value.trim();
+    const guesses = guessesInput.value.trim();
+    let url = `ws://${window.location.hostname}:8080/?room=${encodeURIComponent(r)}`;
+
+    if (puzzles) url += `&puzzles=${encodeURIComponent(puzzles)}`;
+    if (guesses) url += `&guesses=${encodeURIComponent(guesses)}`;
+
+    connect(url);
+  };
   guessBtn.onclick = sendGuess;
   guessBtn2.onclick = sendGuess;
   showOp.addEventListener('change', function () {
@@ -365,7 +374,6 @@
 })();
 
 (() => {
-  //  keyboard at the bottom
   const keyboardLayout = [
     "q w e r t y u i o p".split(" "),
     "a s d f g h j k l".split(" "),
@@ -373,16 +381,21 @@
   ];
 
   const keyboardContainer = document.getElementById("keyboard");
-  const guessInput = document.getElementById("guessInput");
-  const guessInput2 = document.getElementById("guessInput2");
-  const guessInput3 = document.getElementById("guessInput3");
-  const guessBtn = document.getElementById("guessBtn");
-  const guessBtn2 = document.getElementById("guessBtn2");
+  const guessInputs = [
+    document.getElementById("guessInput"),
+    document.getElementById("guessInput2"),
+    document.getElementById("guessInput3")
+  ];
+  const guessBtns = [
+    document.getElementById("guessBtn"),
+    document.getElementById("guessBtn2")
+  ];
 
-  const boardCount = 8;
+  let boardCount = 8; // default, will overwrite from server
   const keyStates = {};
-  //  Create the keyboard
+
   function createKeyboard() {
+    //keyboardContainer.innerHTML = ''; // clear existing
     keyboardLayout.forEach(row => {
       const rowDiv = document.createElement("div");
       rowDiv.classList.add("keyboard-row");
@@ -397,6 +410,15 @@
         if (key.length === 1 && /[a-z]/.test(key)) {
           const slices = document.createElement("div");
           slices.classList.add("key-slices");
+
+          // Dynamic grid based on boardCount
+          const cols = Math.ceil(Math.sqrt(boardCount));
+          const rows = Math.ceil(boardCount / cols);
+          slices.style.display = "grid";
+          slices.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+          slices.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+          slices.style.gap = '1px';
+
           for (let i = 0; i < boardCount; i++) {
             const slice = document.createElement("div");
             slice.classList.add("slice");
@@ -413,37 +435,23 @@
       keyboardContainer.appendChild(rowDiv);
     });
   }
-  // Event handling
+
   function onKeyClick(e) {
     const key = e.target.dataset.key;
 
     if (key === "Enter") {
-      guessBtn.click();
-      guessInput.value = "";
-      guessInput2.value = "";
-      guessInput3.value = "";
-    }
-    else if (key === "Back") {
-      guessInput.value = guessInput.value.slice(0, -1);
-      guessInput2.value = guessInput2.value.slice(0, -1);
-      guessInput3.value = guessInput3.value.slice(0, -1);
-    }
-    else if (key.length === 1) {
-
-      if (guessInput.value.length < 5) {
-        guessInput.value += key.toLowerCase();
-      }
-      if (guessInput2.value.length < 5) {
-        guessInput2.value += key.toLowerCase();
-      }
-      if (guessInput3.value.length < 5) {
-        guessInput3.value += key.toLowerCase();
-      }
+      guessBtns.forEach(btn => btn.click());
+      guessInputs.forEach(input => input.value = "");
+    } else if (key === "Back") {
+      guessInputs.forEach(input => input.value = input.value.slice(0, -1));
+    } else if (key.length === 1) {
+      guessInputs.forEach(input => {
+        if (input.value.length < 5) input.value += key.toLowerCase();
+      });
     }
   }
 
-
-  //  Update the keys on guess
+  // update keyboard colors
   window.updateKeyboardColors = function (guess, feedback, boardIndex) {
     for (let i = 0; i < 5; i++) {
       const letter = guess[i];
@@ -451,10 +459,8 @@
       const btn = document.querySelector(`.key[data-key="${letter}"]`);
       if (!btn) continue;
 
-
       if (!keyStates[letter]) keyStates[letter] = Array(boardCount).fill(null);
       keyStates[letter][boardIndex] = fb;
-
 
       const slices = btn.querySelectorAll(".slice");
       slices.forEach((s, idx) => {
@@ -463,11 +469,15 @@
         if (state === "g") color = "var(--green)";
         else if (state === "y") color = "var(--yellow)";
         else if (state === "b") color = "var(--gray)";
-        else if (state === null) color = "var(--green)";
+        else color = "var(--green)";
         s.style.background = color;
       });
     }
   };
 
-  createKeyboard();
+  // Called from server join message
+  window.initKeyboard = function(serverBoardCount) {
+    boardCount = serverBoardCount;
+    createKeyboard();
+  };
 })();

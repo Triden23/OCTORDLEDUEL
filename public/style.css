@@ -48,8 +48,17 @@ h1{margin:6px 0 12px;font-size:20px;}
 .tile.b{background:var(--gray);color:#fff;opacity:0.9;}
 .tile.op-hidden{background:rgba(255,255,255,0.03);color:transparent;}
 .tile.op-solved{background:var(--green);color:#021;}
-#controls{margin-bottom:10px;}
-#controls input{padding:6px;border-radius:6px;border:none;background:#08111a;color:#fff}
+#controls{margin-bottom:10px;margin-right: 8px;}
+
+#controls input {
+  width: 60px; 
+  padding: 6px;
+  border-radius: 6px;
+  border: none;
+  background: #08111a;
+  color: #fff;
+  margin-right: 4px;
+}
 #controls button{margin-left:8px;padding:6px 10px;border-radius:6px;border:none;background:#1e3a8a;color:#fff}
 #status{margin-top:8px;color:var(--muted)}
 #inputArea{margin-top:12px}
@@ -154,8 +163,6 @@ h1{margin:6px 0 12px;font-size:20px;}
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(2, auto);
   pointer-events: none;
   border-radius: 4px;
   opacity: 0.5;
@@ -177,3 +184,4 @@ h1{margin:6px 0 12px;font-size:20px;}
 #bottomSpacer {
   margin-bottom: 185px;
 }
+

@@ -1727,6 +1727,14 @@ const PICKS = [
 "young", "youth", "zebra", "zesty", "zonal" 
 ];
 
+const room = {
+  ID:"Default",//Default value
+  Puzzles:8,//Default value
+  Guesses:13//Default value
+}
+
+
+
 
 function pickN(n) {
   const copy = PICKS.slice();
@@ -1770,16 +1778,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const rooms = new Map();
 
-function createRoom(roomId) {
+function createRoom(roomId, puzzles = 8, guesses = 13) {
   const room = {
     id: roomId,
     sockets: [],
-    answers: pickN(8),
+    answers: pickN(puzzles),
     playersData: {},
+    puzzles,
+    guesses,
     createdAt: Date.now()
   };
   rooms.set(roomId, room);
-  console.log(`Created room ${roomId} with answers: ${room.answers.join(',')}`);
+  console.log(`Created room ${roomId} with ${puzzles} puzzles and ${guesses} guesses: ${room.answers.join(',')}`);
   return room;
 }
 
@@ -1796,7 +1806,13 @@ wss.on('connection', function (ws, req) {
   const fullUrl = `http://${host}${url}`;
   const q = new URL(fullUrl).searchParams;
   const roomId = q.get('room') || 'default';
-  let room = rooms.get(roomId) || createRoom(roomId);
+  const puzzles = parseInt(q.get('puzzles'))|| 8; //Default should be 8 if left empty
+  const guesses = parseInt(q.get('guesses')) || 13; //Default should be 13 if left empty
+
+  //let room = rooms.get(roomId) || createRoom(roomId);
+
+  let room = rooms.get(roomId);
+  if (!room) room = createRoom(roomId,puzzles, guesses);
 
   const playerId = assignPlayerId(room);
   if (!playerId) {
@@ -1807,24 +1823,24 @@ wss.on('connection', function (ws, req) {
 
   room.sockets.push({ ws, playerId });
   room.playersData[playerId] = {
-    attemptsPerBoard: Array.from({ length: 13 }, () => []),
-    solved: Array.from({ length: 8 }, () => false),
+    attemptsPerBoard: Array.from({ length: room.guesses }, () => []),
+    solved: Array.from({ length: room.puzzles }, () => false),
     solvedCount: 0
   };
 
   ws.send(JSON.stringify({
     type: 'joined',
     playerId,
-    boardCount: 8,
-    maxGuesses: 13
+    boardCount: room.puzzles,
+    maxGuesses: room.guesses
   }));
 
   if (room.sockets.length === 2) {
     room.sockets.forEach(s => s.ws.send(JSON.stringify({
       type: 'start',
       message: 'Both players connected! Game starting!',
-      boardCount: 8,
-      maxGuesses: 13
+      boardCount: room.puzzles,
+      maxGuesses: room.guesses
     })));
   } else {
     ws.send(JSON.stringify({ type: 'wait', message: 'Waiting for opponent...' }));
